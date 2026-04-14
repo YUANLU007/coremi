@@ -186,9 +186,12 @@ function init(){
 function resize(){
   const r=cv.parentElement.getBoundingClientRect();
   W=r.width;H=r.height;
-  cv.width=W*devicePixelRatio;cv.height=H*devicePixelRatio;
+  if(W===0||H===0)return;
+  const dpr=devicePixelRatio||1;
+  cv.width=W*dpr;cv.height=H*dpr;
   cv.style.width=W+'px';cv.style.height=H+'px';
-  ctx.scale(devicePixelRatio,devicePixelRatio);
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(dpr,dpr);
 }
 
 function stepAnim(){
@@ -325,8 +328,8 @@ function renderTab(){
   }
 }
 
-window.addEventListener('load',init);
-window.addEventListener('resize',()=>{resize();});
+window.addEventListener('load',()=>setTimeout(init,100));
+window.addEventListener('resize',()=>{if(cv)resize();});
 </script>
 </body>
 </html>
