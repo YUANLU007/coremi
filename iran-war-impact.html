@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COREMI — 伊朗战争全球冲击波</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body{background:#080b12;color:#e8e6e0;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+#topbar{height:40px;background:#0d1117;border-bottom:1px solid #1e2530;display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0}
+.logo{font-size:13px;font-weight:700;color:#ef4444}
+.title{font-size:11px;color:#4a5568;flex:1}
+.alert{font-size:10px;background:#2e0808;color:#ef4444;padding:2px 8px;border-radius:10px;border:1px solid #ef444440}
+.btn{padding:2px 10px;font-size:11px;border:1px solid #2a3540;border-radius:20px;background:transparent;color:#6b7280;cursor:pointer}
+.live{width:7px;height:7px;border-radius:50%;background:#ef4444;animation:bk 1s infinite;flex-shrink:0}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.15}}
+#main{flex:1;display:flex;overflow:hidden}
+#left{flex:1;position:relative}
+canvas{position:absolute;inset:0}
+#right{width:240px;border-left:1px solid #1a2030;display:flex;flex-direction:column;background:#0a0d14;flex-shrink:0}
+.rh{padding:8px 10px;border-bottom:1px solid #1a2030;font-size:10px;font-weight:600;color:#888}
+#mkt{flex:1;overflow-y:auto;padding:6px 8px}
+#mkt::-webkit-scrollbar{width:2px}
+#mkt::-webkit-scrollbar-thumb{background:#1e2530}
+.mk{padding:5px 2px;border-bottom:1px solid #0d1117}
+.mr{display:flex;justify-content:space-between;align-items:center}
+.ms{font-size:11px;font-weight:600;color:#ddd}
+.mc{font-size:11px;font-weight:600}
+.mn{font-size:10px;color:#374151}
+#barsec{padding:8px 10px;border-top:1px solid #1a2030}
+.bt{font-size:10px;color:#374151;margin-bottom:4px}
+.bi{margin-bottom:4px}
+.bh{display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px}
+.bl{color:#888}
+.btr{height:3px;background:#111820;border-radius:2px}
+.bf{height:100%;border-radius:2px;transition:width 1s}
+#timeline{height:28px;background:#0a0d14;border-top:1px solid #1a2030;display:flex;flex-shrink:0}
+.tli{flex:1;text-align:center;font-size:9px;color:#374151;padding:3px 1px;border-right:1px solid #111820;cursor:pointer;line-height:1.4;transition:all .15s}
+.tli:hover{color:#888;background:#0d1117}
+.tli.on{color:#ef4444;border-bottom:2px solid #ef4444;background:#150a0a}
+#tip{position:absolute;pointer-events:none;z-index:20;background:#0d1117;border:1px solid #2a3540;border-radius:8px;padding:9px 12px;font-size:11px;max-width:200px;line-height:1.6;opacity:0;transition:opacity .15s;color:#9ca3af}
+#tip b{color:#e2e8f0;display:block;margin-bottom:3px;font-size:12px}
+a.gh{position:absolute;bottom:10px;right:10px;z-index:10;background:#0d1117cc;border:1px solid #2a3540;border-radius:6px;padding:4px 10px;font-size:10px;color:#6b7280;text-decoration:none}
+a.gh:hover{color:#aaa;border-color:#444}
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div class="live"></div>
+  <span class="logo">COREMI</span>
+  <span class="title">伊朗战争全球冲击波 · 实时传导分析 4/14/2026</span>
+  <span class="alert">⚠ 谈判破裂 · 美军封锁霍尔木兹</span>
+  <button class="btn" onclick="toggleA()" id="btn">⏸ 暂停</button>
+</div>
+<div id="main">
+  <div id="left">
+    <canvas id="cv"></canvas>
+    <div id="tip"></div>
+    <a class="gh" href="https://github.com/YUANLU007/coremi" target="_blank">⭐ github.com/YUANLU007/coremi</a>
+  </div>
+  <div id="right">
+    <div class="rh">实时市场 · 4月14日</div>
+    <div id="mkt"></div>
+    <div id="barsec">
+      <div class="bt">影响强度</div>
+      <div id="bars"></div>
+    </div>
+  </div>
+</div>
+<div id="timeline"></div>
+
+<script>
+var cv=document.getElementById('cv'),ctx,W,H,run=true,T=0,waves=[],hov=null,drag=null,dox=0,doy=0;
+
+var MKT=[
+  {s:'BRN',n:'布伦特原油',c:'$101.82↑',cl:'#ef4444',d:'谈判破裂+封锁 重破$100'},
+  {s:'WTI',n:'WTI原油',c:'$97.45',cl:'#f97316',d:'现货Dated$144 溢价$35'},
+  {s:'GOLD',n:'黄金现货',c:'$4,748',cl:'#f59e0b',d:'年内+47% 4月14日实时'},
+  {s:'LNG',n:'亚洲LNG',c:'+143%',cl:'#ef4444',d:'卡塔尔设施受袭'},
+  {s:'LMT',n:'洛克希德·马丁',c:'+32%YTD',cl:'#22c55e',d:'1.5万亿国防预算'},
+  {s:'XOM',n:'埃克森美孚',c:'+18%QTD',cl:'#22c55e',d:'最大季度涨幅'},
+  {s:'UAL',n:'美联航',c:'−15%',cl:'#6b7280',d:'燃油成本高企'},
+  {s:'SPX',n:'S&P 500',c:'6,782',cl:'#5b9cf6',d:'封锁再度承压'},
+];
+var DIMS=[
+  {l:'原油供应缺口',v:96,c:'#ef4444'},
+  {l:'谈判破裂风险',v:90,c:'#ef4444'},
+  {l:'航运成本压力',v:88,c:'#a78bfa'},
+  {l:'军工股强度',v:85,c:'#5b9cf6'},
+  {l:'黄金避险需求',v:80,c:'#f59e0b'},
+  {l:'欧盟经济压力',v:74,c:'#22c55e'},
+];
+var TLS=['2.28 开战','3.1 封锁','3.4 $120','3.18 LNG','4.7 停火','4.13 封锁'];
+
+var NODES=[
+  {id:'war', lb:['伊朗','战争'],      cat:'core',  sz:26,fx:.50,fy:.46},
+  {id:'str', lb:['霍尔木兹','封锁中'],cat:'energy',sz:22,fx:.24,fy:.28},
+  {id:'oil', lb:['原油','$101↑'],     cat:'energy',sz:20,fx:.50,fy:.16},
+  {id:'lng', lb:['LNG','+143%'],      cat:'energy',sz:15,fx:.76,fy:.23},
+  {id:'gold',lb:['黄金','$4748'],     cat:'commod',sz:16,fx:.89,fy:.28},
+  {id:'blkd',lb:['美军','封锁'],      cat:'warn',  sz:17,fx:.24,fy:.62},
+  {id:'tun', lb:['钨价','+50%'],      cat:'commod',sz:12,fx:.88,fy:.47},
+  {id:'sp',  lb:['S&P','再承压'],     cat:'fin',   sz:16,fx:.75,fy:.58},
+  {id:'def', lb:['军工股','+32%'],    cat:'fin',   sz:14,fx:.88,fy:.72},
+  {id:'air', lb:['航空','−15%'],      cat:'fin',   sz:12,fx:.60,fy:.74},
+  {id:'semi',lb:['半导体','成本↑'],   cat:'mfg',   sz:13,fx:.29,fy:.65},
+  {id:'ship',lb:['航运','×3倍'],      cat:'mfg',   sz:13,fx:.14,fy:.74},
+  {id:'us',  lb:['美国','GDP↓'],      cat:'nat',   sz:14,fx:.77,fy:.87},
+  {id:'eu',  lb:['欧盟','GDP−1.2%'], cat:'nat',   sz:14,fx:.51,fy:.89},
+  {id:'cn',  lb:['中国','受益?'],     cat:'nat',   sz:13,fx:.31,fy:.84},
+  {id:'gulf',lb:['海湾','粮食危机'],  cat:'nat',   sz:12,fx:.12,fy:.87},
+];
+var EDGES=[
+  [0,1],[0,2],[0,5],[0,7],[0,4],
+  [1,2],[1,11],[1,15],[1,10],
+  [2,3],[2,7],[2,9],[2,13],[2,14],
+  [3,10],[5,11],[5,15],[5,10],
+  [7,8],[7,12],[7,13],[8,12],[9,12],[10,14],[6,8],
+];
+var CC={core:'#ef4444',energy:'#f97316',commod:'#f59e0b',fin:'#5b9cf6',mfg:'#a78bfa',nat:'#22c55e',warn:'#ff6b35'};
+var CD={core:'#2e0808',energy:'#2e1a08',commod:'#2a1e08',fin:'#081e3a',mfg:'#1e1030',nat:'#082e14',warn:'#2e1508'};
+var INFO={
+  war:'美以联合空袭2026.2.28\n哈梅内伊遇刺\n伊斯兰堡谈判4.13破裂\n美军宣布封锁霍尔木兹',
+  str:'每日封锁约1100万桶\n周六仅17艘船通过(战前130)\n实货Dated Brent $144',
+  oil:'期货$101，现货$144\n价差$35=物理短缺强烈信号\nIEA：史上最大供应缺口',
+  lng:'卡塔尔LNG设施受袭\n亚洲价格飙涨+143%\n韩国工厂产能降至20%',
+  gold:'4月14日实时：$4,748\n年内涨幅+47%\n目标$5,000-6,000',
+  blkd:'4.13谈判破裂后宣布\n美军封锁伊朗港口\n油价单日+8%破$103',
+  tun:'中国限制出口+50%\n影响军工/半导体/光伏',
+  sp:'Q1 -4.6%，2022来最差\n停火反弹后封锁再承压\n停火破裂目标6,200',
+  def:'LMT/NOC/RTX +30%+\n1.5万亿美元国防预算\n结构性牛市刚开始',
+  air:'停火反弹+9.5%后回落\n燃油成本仍高企\n中东航线中断',
+  semi:'台湾/韩国能源成本↑\n氦气/硫磺双重短缺\n从领涨变领跌',
+  ship:'保险费涨20-40倍\n34000艘船已改道绕行\n绕行好望角+10-14天',
+  us:'衰退概率20%\n封锁加剧通胀风险\n汽油均价$4.125/加仑',
+  eu:'能源冲击最大受害者\nGDP预测-1.2%\n滞胀风险最高',
+  cn:'低价购伊朗油受益\n出口受航运成本拖累\n人民币承压',
+  gulf:'80%粮食依赖海峡\n70%食品进口中断\n社会稳定受到威胁',
+};
+
+function init(){
+  ctx=cv.getContext('2d');
+  resize();
+  NODES.forEach(function(n){n.px=n.fx*W;n.py=n.fy*H;n.vx=(Math.random()-.5)*.2;n.vy=(Math.random()-.5)*.2;});
+
+  document.getElementById('mkt').innerHTML=MKT.map(function(m){
+    return '<div class="mk"><div class="mr"><span class="ms">'+m.s+'</span>'
+      +'<span class="mc" style="color:'+m.cl+'">'+m.c+'</span></div>'
+      +'<div class="mn">'+m.n+' · '+m.d+'</div></div>';
+  }).join('');
+
+  document.getElementById('bars').innerHTML=DIMS.map(function(d){
+    return '<div class="bi"><div class="bh"><span class="bl">'+d.l+'</span>'
+      +'<span style="color:'+d.c+';font-size:10px">'+d.v+'</span></div>'
+      +'<div class="btr"><div class="bf" style="width:'+d.v+'%;background:'+d.c+'"></div></div></div>';
+  }).join('');
+
+  document.getElementById('timeline').innerHTML=TLS.map(function(l,i){
+    return '<div class="tli'+(i===5?' on':'')
+      +'" onclick="setScene('+i+')">'+l+'</div>';
+  }).join('');
+
+  requestAnimationFrame(loop);
+}
+
+function resize(){
+  var r=cv.parentElement.getBoundingClientRect();
+  W=r.width;H=r.height;
+  var dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  cv.style.width=W+'px';cv.style.height=H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+function loop(){
+  if(run)T+=.015;
+  if(run&&Math.random()<.04)waves.push({x:NODES[0].px,y:NODES[0].py,r:NODES[0].sz,a:.4});
+  waves=waves.filter(function(w){w.r+=2.2;w.a-=.012;return w.a>0;});
+  paint();requestAnimationFrame(loop);
+}
+
+function paint(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#080b12';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,.025)';ctx.lineWidth=.5;
+  for(var x=0;x<W;x+=55){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(var y=0;y<H;y+=55){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  waves.forEach(function(w){
+    ctx.beginPath();ctx.arc(w.x,w.y,w.r,0,Math.PI*2);
+    ctx.strokeStyle='rgba(239,68,68,'+w.a+')';ctx.lineWidth=1.2;ctx.stroke();
+  });
+
+  EDGES.forEach(function(e,i){
+    var a=NODES[e[0]],b=NODES[e[1]],h=hov===a||hov===b;
+    ctx.beginPath();ctx.moveTo(a.px,a.py);ctx.lineTo(b.px,b.py);
+    ctx.strokeStyle=h?'rgba(239,68,68,.55)':'rgba(255,255,255,.07)';
+    ctx.lineWidth=h?1.5:.5;ctx.stroke();
+    if(run){
+      var p=(T*.4+i*.17)%1,px=a.px+(b.px-a.px)*p,py=a.py+(b.py-a.py)*p;
+      ctx.beginPath();ctx.arc(px,py,2.2,0,Math.PI*2);
+      ctx.fillStyle='rgba(239,68,68,.6)';ctx.fill();
+    }
+  });
+
+  NODES.forEach(function(n){
+    var h=hov===n,r=n.sz+(h?5:0),c=CC[n.cat],d=CD[n.cat];
+    ctx.beginPath();ctx.arc(n.px,n.py,r+8,0,Math.PI*2);ctx.fillStyle=c+'14';ctx.fill();
+    ctx.beginPath();ctx.arc(n.px,n.py,r,0,Math.PI*2);ctx.fillStyle=h?c:d;ctx.fill();
+    ctx.strokeStyle=c;ctx.lineWidth=h?2:1;ctx.stroke();
+    if((n.cat==='core'||n.cat==='warn')&&run){
+      var pr=(Math.sin(T*2.5)+1)*5;
+      ctx.beginPath();ctx.arc(n.px,n.py,r+pr,0,Math.PI*2);
+      ctx.strokeStyle='rgba(239,68,68,'+Math.max(0,.22-pr*.018)+')';
+      ctx.lineWidth=1;ctx.stroke();
+    }
+    ctx.fillStyle=h?'#fff':c;
+    ctx.font=(h?'600 ':'')+( n.sz>20?11:10)+'px sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    n.lb.forEach(function(l,i){ctx.fillText(l,n.px,n.py+(i-(n.lb.length-1)/2)*13);});
+  });
+
+  if(hov){
+    var info=INFO[hov.id]||'';
+    var lines=info.split('\n');
+    var tx=Math.min(hov.px+hov.sz+12,W-195),ty=Math.max(hov.py-50,4);
+    var bh=lines.length*15+22;
+    ctx.fillStyle='#0d1117';ctx.strokeStyle='#2a3540';ctx.lineWidth=.8;
+    ctx.beginPath();ctx.rect(tx,ty,188,bh);ctx.fill();ctx.stroke();
+    ctx.textAlign='left';
+    ctx.fillStyle='#e2e8f0';ctx.font='bold 11px sans-serif';
+    ctx.fillText(hov.lb.join(' '),tx+8,ty+14);
+    ctx.fillStyle='#9ca3af';ctx.font='10px sans-serif';
+    lines.forEach(function(l,i){ctx.fillText(l,tx+8,ty+26+i*14);});
+  }
+}
+
+cv.addEventListener('mousemove',function(e){
+  var r=cv.getBoundingClientRect(),sx=W/r.width,sy=H/r.height;
+  var mx=(e.clientX-r.left)*sx,my=(e.clientY-r.top)*sy;
+  if(drag){drag.px=mx-dox;drag.py=my-doy;return;}
+  hov=null;NODES.forEach(function(n){if(Math.hypot(mx-n.px,my-n.py)<n.sz+6)hov=n;});
+  cv.style.cursor=hov?'pointer':'default';
+});
+cv.addEventListener('mousedown',function(e){
+  var r=cv.getBoundingClientRect(),sx=W/r.width,sy=H/r.height;
+  var mx=(e.clientX-r.left)*sx,my=(e.clientY-r.top)*sy;
+  NODES.forEach(function(n){if(Math.hypot(mx-n.px,my-n.py)<n.sz+6){drag=n;dox=mx-n.px;doy=my-n.py;}});
+});
+cv.addEventListener('mouseup',function(){drag=null;});
+
+function toggleA(){run=!run;document.getElementById('btn').textContent=run?'⏸ 暂停':'▶ 播放';}
+
+function setScene(i){
+  document.querySelectorAll('.tli').forEach(function(el,j){el.classList.toggle('on',j===i);});
+}
+
+window.addEventListener('load',function(){setTimeout(init,80);});
+window.addEventListener('resize',function(){if(ctx){resize();NODES.forEach(function(n){n.px=n.fx*W;n.py=n.fy*H;});}});
+</script>
+</body>
+</html>
