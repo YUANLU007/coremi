@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COREMI 科睿 — AI知识图谱</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#080b12;color:#e8e6e0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#bar{height:40px;background:#0d1117;border-bottom:1px solid #1e2530;display:flex;align-items:center;gap:8px;padding:0 14px;flex-shrink:0}
+.dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.logo{font-size:13px;font-weight:700;color:#5b9cf6}
+.ttl{font-size:11px;color:#4a5568;flex:1}
+.btn{padding:3px 11px;font-size:11px;border:1px solid #2a3540;border-radius:20px;background:transparent;color:#6b7280;cursor:pointer}
+.btn.on{background:#1a3a5c;color:#5b9cf6;border-color:#2a5c9a}
+
+#main{flex:1;display:flex;min-height:0}
+
+/* Graph area */
+#graph{flex:1;position:relative;overflow:hidden;background:#080b12}
+#graph svg{width:100%;height:100%}
+
+.node-g{cursor:pointer}
+.node-g circle{transition:r .2s,opacity .2s}
+.node-g:hover circle.bg{opacity:.25}
+.node-g text{pointer-events:none;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+.edge{stroke:rgba(255,255,255,.1);stroke-width:.5;fill:none}
+.edge.hl{stroke:rgba(91,156,246,.6);stroke-width:1.5}
+
+@keyframes pulse{0%,100%{r:32;opacity:.3}50%{r:40;opacity:.1}}
+.pulse-ring{animation:pulse 2s ease-in-out infinite;fill:none;stroke:#5b9cf6;stroke-width:1}
+
+@keyframes flow{0%{stroke-dashoffset:200}100%{stroke-dashoffset:0}}
+.flow-line{stroke-dasharray:4 8;animation:flow 3s linear infinite;opacity:.4}
+
+#leg{position:absolute;bottom:10px;left:10px;background:#0d1117cc;border:1px solid #1e2530;border-radius:8px;padding:8px 10px}
+.lr{display:flex;align-items:center;gap:6px;font-size:10px;color:#555;margin:2px 0}
+.ld{width:6px;height:6px;border-radius:50%}
+
+/* Right panel */
+#panel{width:260px;flex-shrink:0;border-left:1px solid #1a2030;display:flex;flex-direction:column;background:#0a0d14}
+.ph{padding:10px 12px;border-bottom:1px solid #1a2030}
+.pt{font-size:12px;font-weight:500;color:#ccc;margin-bottom:2px}
+.pm{font-size:10px;color:#555}
+.sc{color:#5b9cf6;font-weight:600}
+#tabs{display:flex;border-bottom:1px solid #1a2030}
+.tab{flex:1;padding:7px 0;font-size:11px;text-align:center;cursor:pointer;color:#555;border-bottom:2px solid transparent}
+.tab.on{color:#5b9cf6;border-bottom-color:#5b9cf6}
+#tbody{flex:1;overflow-y:auto;padding:8px 10px}
+#tbody::-webkit-scrollbar{width:2px}
+#tbody::-webkit-scrollbar-thumb{background:#222}
+
+.am{margin-bottom:8px;padding:8px 10px;border-radius:8px;border:1px solid #1a2030;background:#0d1117;animation:fadeup .3s}
+@keyframes fadeup{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.ah{display:flex;justify-content:space-between;margin-bottom:3px}
+.an{font-size:11px;font-weight:600}
+.at{font-size:10px;color:#333}
+.ax{font-size:11px;color:#999;line-height:1.5}
+.ag{display:inline-block;font-size:10px;padding:1px 7px;border-radius:8px;margin-top:4px}
+.tr{display:flex;justify-content:space-between;align-items:center;padding:6px 2px;border-bottom:1px solid #111}
+.ts{font-size:11px;font-weight:600;color:#ddd}
+.tn{font-size:10px;color:#444;margin-top:1px}
+.pos{color:#22c55e;font-size:12px;font-weight:600}
+.neg{color:#ef4444;font-size:12px;font-weight:600}
+.di{margin-bottom:8px}
+.dh{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
+.dl{color:#bbb;font-weight:500}
+.db{height:3px;background:#111820;border-radius:2px;margin-bottom:2px;overflow:hidden}
+.df{height:100%;border-radius:2px;transition:width 1.2s}
+.dd{font-size:10px;color:#444}
+
+/* Tooltip */
+#tooltip{position:absolute;background:#0d1117;border:1px solid #2a3540;border-radius:8px;padding:9px 12px;font-size:11px;max-width:200px;line-height:1.6;pointer-events:none;display:none;z-index:100;color:#9ca3af}
+#tooltip b{color:#e2e8f0;display:block;margin-bottom:3px;font-size:12px}
+
+@media(max-width:600px){
+  #panel{width:100%;height:180px;border-left:none;border-top:1px solid #1a2030}
+  #main{flex-direction:column}
+  #leg{display:none}
+}
+</style>
+</head>
+<body>
+<div id="bar">
+  <div class="dot"></div>
+  <span class="logo">COREMI 科睿</span>
+  <span class="ttl">AI知识图谱 · 实时分析</span>
+  <button class="btn" onclick="doRefresh()">↻ 刷新</button>
+</div>
+<div id="main">
+  <div id="graph">
+    <svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="leg">
+      <div class="lr"><span class="ld" style="background:#5b9cf6"></span>基础设施</div>
+      <div class="lr"><span class="ld" style="background:#22c55e"></span>AI模型</div>
+      <div class="lr"><span class="ld" style="background:#a78bfa"></span>资本/VC</div>
+      <div class="lr"><span class="ld" style="background:#f97316"></span>供应链</div>
+      <div class="lr"><span class="ld" style="background:#ef4444"></span>地缘政治</div>
+      <div class="lr"><span class="ld" style="background:#6b7280"></span>监管</div>
+    </div>
+    <div id="tooltip"></div>
+  </div>
+  <div id="panel">
+    <div class="ph">
+      <div class="pt">Anthropic → AWS Trainium2 ×100万颗</div>
+      <div class="pm">Reuters · 2026-04-13 · <span class="sc">94/100</span></div>
+    </div>
+    <div id="tabs">
+      <div class="tab on" onclick="setTab('a')">智能体</div>
+      <div class="tab" onclick="setTab('s')">受益股</div>
+      <div class="tab" onclick="setTab('d')">维度</div>
+    </div>
+    <div id="tbody"></div>
+  </div>
+</div>
+
+<script>
+var NODES=[
+  {id:'news',lb:'Trainium2\n×100万颗',cat:'ai',  r:22,x:.50,y:.44,info:'核心事件：Anthropic+AWS深度绑定，算力10倍扩容'},
+  {id:'amzn',lb:'亚马逊\nAWS',         cat:'inf', r:18,x:.28,y:.26,info:'直接受益：独家算力合同，估值+4.2%'},
+  {id:'nvda',lb:'英伟达',              cat:'inf', r:17,x:.72,y:.23,info:'竞争压力：H100份额风险，短期-1.8%'},
+  {id:'tsmc',lb:'台积电',              cat:'sup', r:13,x:.17,y:.58,info:'Trainium2代工，3nm工艺受益'},
+  {id:'anth',lb:'Anthropic',           cat:'ai',  r:15,x:.36,y:.66,info:'算力10倍扩容，Claude推理能力大幅提升'},
+  {id:'msft',lb:'微软\nAzure',         cat:'inf', r:12,x:.76,y:.58,info:'竞争格局被重新审视'},
+  {id:'vc',  lb:'AI融资\n信号',        cat:'vc',  r:13,x:.54,y:.17,info:'AI infra赛道估值支撑增强'},
+  {id:'ge',  lb:'GE电力',              cat:'sup', r:12,x:.21,y:.79,info:'200-500MW新增电力需求'},
+  {id:'geo', lb:'中美科技\n博弈',      cat:'geo', r:13,x:.80,y:.73,info:'美国AI算力自主化，减少英伟达依赖'},
+  {id:'reg', lb:'反垄断\n监管',        cat:'reg', r:11,x:.63,y:.82,info:'算力集中引发FTC关注'},
+  {id:'bot', lb:'具身智能',            cat:'ai',  r:12,x:.38,y:.21,info:'推理算力扩容加速机器人inference'},
+  {id:'hyn', lb:'SK海力士\nHBM',       cat:'sup', r:12,x:.08,y:.40,info:'Trainium2大量HBM需求，订单受益'},
+  {id:'lab', lb:'顶级实链\n信号',      cat:'vc',  r:13,x:.86,y:.40,info:'第二家顶级实验室标准化Trainium'},
+];
+var EDGES=[[0,1],[0,2],[0,4],[0,6],[0,8],[1,2],[1,7],[1,11],[2,5],[3,4],[10,0],[6,12],[8,9],[4,7]];
+var CC={ai:'#22c55e',inf:'#5b9cf6',sup:'#f97316',geo:'#ef4444',vc:'#a78bfa',reg:'#6b7280'};
+
+var AG=[
+  {n:'News Fetcher',tg:'M2',tc:'#5b9cf6',tm:'09:00:12',tx:'抓取Reuters独家：Anthropic将在AWS部署100万颗Trainium2，P1级双源验证完成。'},
+  {n:'Lab Chain',tg:'M11',tc:'#22c55e',tm:'09:00:18',tx:'顶级实链触发：Trainium2成为第二家顶级实验室标准算力，标准化评分8/10。'},
+  {n:'Financial Analyst',tg:'M4',tc:'#a78bfa',tm:'09:00:31',tx:'DCF完成。AMZN算力收入+12%，NVDA数据中心份额下调3-5%风险。'},
+  {n:'Beneficial Stocks',tg:'M6',tc:'#f97316',tm:'09:00:44',tx:'6大市场扫描完成。AMZN+4.2%，GE+3.3%，中际旭创+2.1%，商汤+1.4%。'},
+  {n:'PSC验证',tg:'M9',tc:'#ef4444',tm:'09:01:02',tx:'路透社+AWS官博双源确认，关键数字真实性100%，可发布。'},
+  {n:'Editor',tg:'M8',tc:'#6b7280',tm:'09:01:15',tx:'审核通过。中文达财新，英文达WSJ标准，导语9/10，建议发布。'},
+];
+var SK=[
+  {s:'AMZN',n:'亚马逊',m:'NASDAQ',c:'+4.2%',p:1},{s:'GE',n:'GE Vernova',m:'NYSE',c:'+3.3%',p:1},
+  {s:'TSM',n:'台积电',m:'NYSE',c:'+2.1%',p:1},{s:'600570',n:'恒生电子',m:'A股',c:'+1.8%',p:1},
+  {s:'9888',n:'百度',m:'港股',c:'+1.4%',p:1},{s:'NVDA',n:'英伟达',m:'NASDAQ',c:'-1.8%',p:0},
+  {s:'MSFT',n:'微软',m:'NASDAQ',c:'-0.5%',p:0},
+];
+var DM=[
+  {l:'芯片/算力',v:97,c:'#5b9cf6',d:'Trainium2规模化 → AWS护城河'},
+  {l:'云基础设施',v:91,c:'#5b9cf6',d:'独家合同，Azure压力上升'},
+  {l:'AI模型竞争',v:89,c:'#22c55e',d:'Claude算力×10，GPT格局重塑'},
+  {l:'顶级实链',v:85,c:'#a78bfa',d:'第二家实验室标准化Trainium'},
+  {l:'VC融资',v:82,c:'#a78bfa',d:'AI infra赛道加速信号'},
+  {l:'电力/能源',v:71,c:'#f97316',d:'200-500MW新增需求'},
+  {l:'地缘政治',v:61,c:'#ef4444',d:'算力自主化战略深化'},
+  {l:'监管',v:55,c:'#6b7280',d:'算力集中引发FTC关注'},
+];
+
+var svg=document.getElementById('svg');
+var tip=document.getElementById('tooltip');
+var tab='a',ai=0;
+
+function ns(tag,attrs){
+  var el=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  for(var k in attrs)el.setAttribute(k,attrs[k]);
+  return el;
+}
+
+function build(){
+  svg.innerHTML='';
+  var W=svg.clientWidth||svg.parentElement.clientWidth||800;
+  var H=svg.clientHeight||svg.parentElement.clientHeight||500;
+
+  // defs
+  var defs=ns('defs',{});
+  NODES.forEach(function(n){
+    var g=ns('radialGradient',{id:'g'+n.id,cx:'50%',cy:'50%',r:'50%'});
+    var c=CC[n.cat];
+    var s1=ns('stop',{'offset':'0%','stop-color':c,'stop-opacity':'0.3'});
+    var s2=ns('stop',{'offset':'100%','stop-color':c,'stop-opacity':'0.05'});
+    g.appendChild(s1);g.appendChild(s2);defs.appendChild(g);
+  });
+  svg.appendChild(defs);
+
+  // edges
+  var eg=ns('g',{});
+  EDGES.forEach(function(e,i){
+    var a=NODES[e[0]],b=NODES[e[1]];
+    var x1=a.x*W,y1=a.y*H,x2=b.x*W,y2=b.y*H;
+    var line=ns('line',{x1:x1,y1:y1,x2:x2,y2:y2,class:'edge'});
+    eg.appendChild(line);
+    // animated flow dot
+    var path=ns('path',{d:'M'+x1+','+y1+' L'+x2+','+y2,
+      class:'flow-line',stroke:CC[a.cat],'stroke-width':'1.5',fill:'none',
+      'stroke-dashoffset':200+i*30});
+    eg.appendChild(path);
+  });
+  svg.appendChild(eg);
+
+  // nodes
+  NODES.forEach(function(n){
+    var cx=n.x*W,cy=n.y*H,c=CC[n.cat];
+    var g=ns('g',{class:'node-g','data-id':n.id});
+
+    // pulse ring for center node
+    if(n.id==='news'){
+      var pr=ns('circle',{cx:cx,cy:cy,r:n.r+6,class:'pulse-ring',stroke:c});
+      g.appendChild(pr);
+    }
+
+    // glow bg
+    var bg=ns('circle',{cx:cx,cy:cy,r:n.r+10,fill:'url(#g'+n.id+')',class:'bg',opacity:.15});
+    g.appendChild(bg);
+
+    // main circle
+    var circle=ns('circle',{cx:cx,cy:cy,r:n.r,fill:'#0d1117',stroke:c,'stroke-width':'1'});
+    g.appendChild(circle);
+
+    // label
+    var lines=n.lb.split('\n');
+    var lh=13,startY=cy-(lines.length-1)*lh/2;
+    lines.forEach(function(l,i){
+      var t=ns('text',{x:cx,y:startY+i*lh,'text-anchor':'middle','dominant-baseline':'middle',
+        fill:c,'font-size':n.r>18?'11':'10','font-family':'-apple-system,sans-serif'});
+      t.textContent=l;
+      g.appendChild(t);
+    });
+
+    // hover events
+    g.addEventListener('mouseenter',function(e){
+      circle.setAttribute('fill',c);
+      circle.setAttribute('r',n.r+4);
+      showTip(e,n);
+    });
+    g.addEventListener('mouseleave',function(){
+      circle.setAttribute('fill','#0d1117');
+      circle.setAttribute('r',n.r);
+      hideTip();
+    });
+    g.addEventListener('mousemove',function(e){moveTip(e);});
+
+    svg.appendChild(g);
+  });
+}
+
+function showTip(e,n){
+  tip.innerHTML='<b>'+n.lb.replace('\n',' ')+'</b>'+n.info;
+  tip.style.display='block';
+  moveTip(e);
+}
+function moveTip(e){
+  var r=svg.getBoundingClientRect();
+  var x=e.clientX-r.left+12,y=e.clientY-r.top-20;
+  if(x+210>r.width)x=e.clientX-r.left-220;
+  tip.style.left=x+'px';tip.style.top=y+'px';
+}
+function hideTip(){tip.style.display='none';}
+
+function doRefresh(){
+  ai=0;renderPanel();
+  build();
+  var iv=setInterval(function(){if(ai<AG.length){ai++;renderPanel();}else clearInterval(iv);},1500);
+}
+
+function setTab(t){
+  tab=t;
+  document.querySelectorAll('.tab').forEach(function(el,i){el.classList.toggle('on',['a','s','d'][i]===t);});
+  renderPanel();
+}
+
+function renderPanel(){
+  var el=document.getElementById('tbody');
+  if(tab==='a'){
+    el.innerHTML=AG.slice(0,ai).reverse().map(function(a){
+      return '<div class="am"><div class="ah"><span class="an" style="color:'+a.tc+'">'+a.n+'</span>'
+        +'<span class="at">'+a.tm+'</span></div><div class="ax">'+a.tx+'</div>'
+        +'<span class="ag" style="background:'+a.tc+'20;color:'+a.tc+'">'+a.tg+'</span></div>';
+    }).join('');
+  }else if(tab==='s'){
+    el.innerHTML=SK.map(function(s){
+      return '<div class="tr"><div><div class="ts">'+s.s+'</div><div class="tn">'+s.n+' · '+s.m+'</div></div>'
+        +'<div class="'+(s.p?'pos':'neg')+'">'+s.c+'</div></div>';
+    }).join('');
+  }else{
+    el.innerHTML=DM.map(function(d){
+      return '<div class="di"><div class="dh"><span class="dl">'+d.l+'</span>'
+        +'<span style="color:'+d.c+';font-weight:600">'+d.v+'</span></div>'
+        +'<div class="db"><div class="df" style="width:'+d.v+'%;background:'+d.c+'"></div></div>'
+        +'<div class="dd">'+d.d+'</div></div>';
+    }).join('');
+  }
+}
+
+// Start
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    build();
+    renderPanel();
+    var iv=setInterval(function(){if(ai<AG.length){ai++;renderPanel();}else clearInterval(iv);},1800);
+  },50);
+});
+window.addEventListener('resize',function(){build();});
+</script>
+</body>
+</html>
