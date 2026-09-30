@@ -1,4 +1,4 @@
-# VISION — Why COREMI Exists
+# VISION - Why COREMI Exists
 
 ## The Problem
 
@@ -40,6 +40,8 @@ So I asked myself three questions:
 
 The answer became COREMI.
 
+In 2026, the architecture matured from a list of specialist modules into a fixed nine-step audit flow. The change is important: a research system should not only produce an answer. It should preserve how that answer was reached, where evidence is weak, and which judgment changed at each stage.
+
 ---
 
 ## The Vision
@@ -70,23 +72,23 @@ COREMI's thesis: **AI can deliver 80% of Bloomberg's intelligence at 1% of the c
 
 Most AI news tools are pipelines: fetch → write → publish.
 
-COREMI is a **multi-agent network**. Agents can re-invoke each other.
+COREMI is a **multi-agent network with a stable audit contract**. Agents can re-invoke each other, while every public stage still writes a numbered Markdown artifact.
 
 Example: When analyzing NVIDIA, the Financial Analyst agent identifies Samsung, Hynix, and Micron as key suppliers. It signals the News Fetcher to run a fresh fetch specifically on those companies. The Competitor module checks how SemiAnalysis and The Information covered the same angle. Then Writer synthesizes across all of it.
 
-This is how a great human editor thinks. COREMI thinks the same way — but faster.
+This is how a great human editor thinks. COREMI keeps that process inspectable, so speed does not erase accountability.
 
 ---
 
 ## The North Star Metric
 
-**2 people. 300 pieces of intelligence. Per day.**
+**A small team with institutional research discipline.**
 
-Not 300 rewrites of press releases. 300 pieces of verified, analyzed, contextualized intelligence — each with:
+The goal is not volume for its own sake. Each publishable result should include:
 - Dual-source cross-verification
 - Financial market implications
 - Expert perspective integrated
-- Published to the right platform in the right format
+- A visible chain from question to final edit
 
 ---
 

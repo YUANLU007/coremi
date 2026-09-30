@@ -1,111 +1,64 @@
 # Contributing to COREMI
 
-Welcome. COREMI is an open-source project built by a journalist, designed for builders who believe information should be intelligent, verified, and accessible.
+COREMI welcomes engineers, journalists, researchers, investors, editors, and domain specialists. The shared goal is not more generated text. It is more inspectable and decision-useful research.
 
-We need developers, domain experts, and people who want to see this exist.
+## Good Contributions
 
----
+- improve a prompt with a clear failure case and before/after example;
+- add a source or claim validation utility;
+- improve accessibility or responsive behavior in the audit demo;
+- document a reproducible workflow;
+- contribute a rights-cleared example run;
+- review financial, editorial, or sourcing assumptions.
 
-## Ways to Contribute
+## Start Here
 
-### 1. Code
-Pick a module from the [ROADMAP](./ROADMAP.md) marked 📋 and build it.
-
-Every module has:
-- A prompt spec in `/prompts/`
-- A defined input/output contract
-- An open GitHub issue with requirements
-
-### 2. Domain Expertise
-Are you a CFA? A journalist? A trader? A researcher?
-
-We need people who can:
-- Validate the output quality of each module
-- Improve prompts based on professional standards
-- Add sources to the source list
-- Review financial analysis outputs
-
-Open a Discussion or comment on relevant Issues.
-
-### 3. Documentation & Examples
-Real outputs from the system are worth more than 1000 lines of docs.
-
-If you run any module and get output — share it in `/docs/examples/`.
-
----
-
-## Getting Started
-
-### Prerequisites
-- Python 3.10+
-- An Anthropic API key (Claude)
-- Basic understanding of LLM API calls
-
-### Setup
 ```bash
-git clone https://github.com/[your-username]/coremi.git
+git clone https://github.com/YUANLU007/coremi.git
 cd coremi
-pip install -r requirements.txt
-cp .env.example .env
-# Add your ANTHROPIC_API_KEY to .env
+python3 coremi.py new "Test research question"
+python3 coremi.py status
 ```
 
-### First Run (News Fetcher)
-```bash
-python src/fetcher/fetch.py --hours 6 --output filtered_news.json
-```
+No API key is required to use the run manager or browser demo.
 
----
+## Pull Request Checklist
 
-## Contribution Guidelines
+- [ ] The change solves one clearly described problem.
+- [ ] Public behavior and artifact contracts remain documented.
+- [ ] Tests or reproducible manual verification steps are included.
+- [ ] No secrets, customer data, private research, or licensed source copies are committed.
+- [ ] Generated claims are not presented as verified facts.
+- [ ] The demo works at desktop and mobile widths.
 
-### Code Style
-- Python 3, type hints preferred
-- Clear comments — this codebase will be read by non-engineers
-- CLI-first: every module should be runnable from terminal
-- Output to JSON — modules are composable
+## Prompt Changes
 
-### Pull Requests
-1. Fork the repo
-2. Create a branch: `git checkout -b feature/module-name`
-3. Write clear commit messages
-4. Open a PR describing: what you built, how to test it, what's still missing
+A prompt change should explain:
 
-### Issues
-- Bug reports: include input, expected output, actual output
-- Feature proposals: explain the use case, not just the feature
-- Questions: use Discussions, not Issues
+1. the observed failure mode;
+2. the proposed instruction;
+3. the expected artifact change;
+4. a representative input;
+5. how a reviewer can judge improvement.
 
----
+Avoid instructions that only make prose sound more confident. Prefer instructions that improve evidence quality, uncertainty handling, or usefulness.
 
-## Module Interface Standard
+## Code Style
 
-Each module should follow this contract:
+- Python 3.9+ with type hints where they improve clarity.
+- Keep the basic run manager dependency-free.
+- Prefer readable files and stable interfaces over hidden state.
+- Keep comments concise and explain decisions, not syntax.
+- Write user-facing artifacts as UTF-8 Markdown.
 
-**Input**: JSON or CLI args
-**Output**: JSON to stdout or file
-**Config**: `.env` or `config.yaml`
+## Security
 
-Example:
-```bash
-# Fetch news
-python src/fetcher/fetch.py --source reuters --hours 6 > news.json
+Read [docs/SECURITY.md](./docs/SECURITY.md) before staging a contribution. Always inspect `git diff --cached` before pushing.
 
-# Score and pitch
-python src/pitch/score.py --input news.json --threshold 70 > pitched.json
+## Issues and Discussions
 
-# Write article
-python src/writer/write.py --input pitched.json --style wsj > article.md
-```
+- Use Issues for reproducible bugs and bounded implementation work.
+- Use Discussions for editorial standards, architecture proposals, research methods, and open-ended questions.
+- Include sample input and expected output when possible.
 
----
-
-## Contact
-
-- **For technical questions**: Open a GitHub Issue
-- **For editorial/domain questions**: Open a GitHub Discussion
-- **For investment/partnership**: [Add founder email]
-
----
-
-*独立 · 独家 · 独到 — Independent · Exclusive · Insightful*
+By contributing, you agree that your contribution is made available under the repository's MIT license.

@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="COREMI open-source nine-step newsroom and investment research audit flow.">
+  <title>COREMI | Nine-Step Audit Flow</title>
+  <style>
+    :root {
+      --ink: #071b2a;
+      --navy: #123654;
+      --paper: #f5f2ea;
+      --white: #fffdf8;
+      --gold: #efb92f;
+      --mint: #5ce0b4;
+      --coral: #f07a68;
+      --line: rgba(239, 185, 47, .34);
+      --muted: #98a9b7;
+      --serif: Georgia, 'Times New Roman', serif;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { color-scheme: dark; scroll-behavior: smooth; }
+    body { margin: 0; background: var(--ink); color: var(--white); font-family: var(--sans); }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+
+    .topbar {
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 12px clamp(18px, 5vw, 72px);
+      border-bottom: 1px solid var(--line);
+      background: var(--navy);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: var(--serif);
+      font-size: 30px;
+      line-height: 1;
+    }
+    .brand strong { display: block; font-family: var(--serif); font-size: 21px; letter-spacing: 0; }
+    .brand small { display: block; margin-top: 2px; color: var(--gold); font: 10px/1 var(--mono); text-transform: uppercase; }
+    .toplinks { display: flex; align-items: center; gap: 20px; color: #d5e0e8; font-size: 13px; }
+    .toplinks a { text-decoration: none; }
+    .toplinks a:hover { color: var(--gold); }
+
+    main { min-height: calc(100vh - 66px); }
+    .hero {
+      min-height: calc(100vh - 66px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr);
+      border-bottom: 1px solid var(--line);
+    }
+    .hero-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(48px, 8vw, 108px) clamp(22px, 7vw, 108px);
+      border-right: 1px solid var(--line);
+      min-width: 0;
+    }
+    .eyebrow { color: var(--gold); font: 11px/1.4 var(--mono); text-transform: uppercase; }
+    h1 { margin: 20px 0 16px; font: 400 clamp(54px, 8vw, 116px)/.9 var(--serif); letter-spacing: 0; }
+    h1 em { color: var(--gold); font-weight: 400; }
+    .dek { max-width: 720px; margin: 0 0 34px; color: #c5d2dc; font: 20px/1.55 var(--serif); }
+
+    .composer { max-width: 820px; background: var(--paper); color: var(--ink); border: 1px solid var(--gold); padding: 16px; }
+    textarea {
+      width: 100%;
+      min-height: 116px;
+      resize: vertical;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ink);
+      font: 19px/1.5 var(--serif);
+    }
+    .composer-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid #d7d0c1; padding-top: 14px; }
+    .hint { color: #706e69; font-size: 12px; }
+    .primary {
+      border: 1px solid #a67400;
+      background: var(--gold);
+      color: var(--ink);
+      min-height: 44px;
+      padding: 0 20px;
+      font-weight: 800;
+    }
+    .primary:hover { background: #ffd66b; }
+    .primary:disabled { cursor: wait; opacity: .65; }
+
+    .hero-side { display: flex; flex-direction: column; justify-content: center; padding: 38px clamp(22px, 4vw, 62px); background: #0a2234; }
+    .side-title { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    .side-title h2 { margin: 0; font: 27px/1.1 var(--serif); }
+    .side-title span { color: var(--mint); font: 11px/1 var(--mono); }
+    .rail { border-top: 1px solid var(--line); }
+    .rail-step {
+      display: grid;
+      grid-template-columns: 38px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 54px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      transition: color .2s, background .2s;
+    }
+    .rail-step strong { color: var(--gold); font: 11px/1 var(--mono); }
+    .rail-step span { font-size: 14px; }
+    .rail-step i { width: 8px; height: 8px; border: 1px solid currentColor; border-radius: 50%; }
+    .rail-step.active { color: var(--white); background: rgba(239, 185, 47, .08); }
+    .rail-step.done i { background: var(--mint); border-color: var(--mint); }
+    .rail-step.done { color: #cdeee3; }
+
+    .audit { padding: 70px clamp(18px, 5vw, 72px) 90px; background: var(--paper); color: var(--ink); }
+    .audit-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; max-width: 1280px; margin: 0 auto 24px; }
+    .audit h2 { margin: 8px 0 0; font: 46px/1 var(--serif); }
+    .run-status { color: #485a67; font: 12px/1.5 var(--mono); text-align: right; }
+    .audit-shell { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 280px minmax(0, 1fr); border: 1px solid #a99b78; min-height: 590px; background: var(--white); }
+    .stage-list { border-right: 1px solid #cfc5ae; background: #ece7db; }
+    .stage-button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-height: 58px;
+      padding: 8px 16px;
+      border: 0;
+      border-bottom: 1px solid #cfc5ae;
+      background: transparent;
+      color: #5c625f;
+      text-align: left;
+    }
+    .stage-button b { font: 11px/1 var(--mono); color: #8a6b15; }
+    .stage-button span { font-size: 13px; }
+    .stage-button.current { background: var(--ink); color: var(--white); }
+    .stage-button.current b { color: var(--gold); }
+    .stage-button.complete span::after { content: '  done'; color: #138562; font: 10px/1 var(--mono); }
+    .artifact { min-width: 0; padding: clamp(24px, 4vw, 54px); overflow-wrap: anywhere; }
+    .artifact-meta { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 18px; border-bottom: 1px solid #d9d0bc; color: #65717a; font: 11px/1.4 var(--mono); }
+    .artifact h3 { margin: 30px 0 18px; font: 36px/1.1 var(--serif); }
+    .stream { max-width: 820px; font: 18px/1.72 var(--serif); white-space: pre-wrap; }
+    .cursor { display: inline-block; width: 8px; height: 1.1em; margin-left: 3px; background: var(--coral); vertical-align: text-bottom; animation: blink .8s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .notice { margin-top: 32px; padding: 14px 16px; border-left: 3px solid var(--gold); background: #eee7d6; color: #5e5a50; font-size: 13px; line-height: 1.5; }
+
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 26px clamp(18px, 5vw, 72px); color: #91a3b0; font-size: 12px; }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-main { border-right: 0; border-bottom: 1px solid var(--line); }
+      .hero-side { min-height: 610px; }
+      .audit-shell { grid-template-columns: 1fr; }
+      .stage-list { display: grid; grid-template-columns: repeat(3, 1fr); border-right: 0; border-bottom: 1px solid #cfc5ae; }
+      .stage-button { min-height: 68px; border-right: 1px solid #cfc5ae; }
+    }
+    @media (max-width: 620px) {
+      .toplinks a:not(:last-child) { display: none; }
+      h1 { font-size: 56px; }
+      .dek { font-size: 18px; }
+      .composer-footer, .audit-head { align-items: stretch; flex-direction: column; }
+      .primary { width: 100%; }
+      .run-status { text-align: left; }
+      .stage-list { grid-template-columns: repeat(2, 1fr); }
+      .stage-button { padding: 8px 10px; }
+      .artifact { padding: 24px 18px 38px; }
+      .artifact-meta { flex-direction: column; }
+      .artifact h3 { font-size: 31px; }
+      footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="COREMI home">
+      <span class="mark" aria-hidden="true">∞</span>
+      <span><strong>Coremi</strong><small>Open audit system</small></span>
+    </a>
+    <nav class="toplinks" aria-label="Repository links">
+      <a href="./README.md">Documentation</a>
+      <a href="./ROADMAP.md">Roadmap</a>
+      <a href="https://github.com/YUANLU007/coremi">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-main">
+        <div class="eyebrow">COREMI · JUDGMENT INTELLIGENCE · 2026.09</div>
+        <h1 id="hero-title">Judge the <em>future.</em></h1>
+        <p class="dek">A visible nine-step newsroom audit, from the first question to the final edit. Keep the evidence, assumptions, disagreement, and judgment in view.</p>
+        <div class="composer">
+          <textarea id="question" aria-label="Research question">How will AI data-center power demand reshape utilities and infrastructure investment?</textarea>
+          <div class="composer-footer">
+            <span class="hint">Interactive sample. No API key or network request.</span>
+            <button class="primary" id="start">Start audit →</button>
+          </div>
+        </div>
+      </div>
+      <aside class="hero-side" aria-label="Nine audit stages">
+        <div class="side-title"><h2>Audit trail</h2><span id="counter">0 / 9</span></div>
+        <div class="rail" id="rail"></div>
+      </aside>
+    </section>
+
+    <section class="audit" id="audit" aria-labelledby="audit-title">
+      <div class="audit-head">
+        <div><div class="eyebrow">VISIBLE WORK, NOT HIDDEN CHAIN OF THOUGHT</div><h2 id="audit-title">Research artifacts</h2></div>
+        <div class="run-status" id="runStatus">Ready · select Start audit</div>
+      </div>
+      <div class="audit-shell">
+        <nav class="stage-list" id="stageList" aria-label="Research artifacts"></nav>
+        <article class="artifact" aria-live="polite">
+          <div class="artifact-meta"><span id="artifactFile">01_soul.md</span><span id="artifactState">waiting</span></div>
+          <h3 id="artifactTitle">Research mandate</h3>
+          <div class="stream" id="stream">Start the sample audit to watch each stage produce a readable artifact.</div>
+          <div class="notice">COREMI exposes stage outputs and evidence decisions. It does not expose or claim access to a model's private chain of thought.</div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>COREMI open-source workflow · MIT License</span><span>Independent · Exclusive · Insightful</span></footer>
+
+  <script>
+    const stages = [
+      { name: 'Soul', file: '01_soul.md', title: 'Research mandate', text: 'Audience: investors, operators, and editors evaluating the infrastructure consequences of AI demand.\n\nDecision: distinguish durable grid investment from a short-lived capacity narrative.\n\nScope: power generation, transmission, cooling, and data-center procurement. Separate reported commitments from forecasts.' },
+      { name: 'News Fetcher', file: '02_fetcher.md', title: 'Source map', text: 'Primary evidence to collect: utility filings, interconnection queues, regulator dockets, company capital-expenditure guidance, and data-center power agreements.\n\nOriginal reporting may identify leads, but each material number must be checked against the underlying document and dated.' },
+      { name: 'Pitch', file: '03_pitch.md', title: 'Why this matters now', text: 'Thesis: the decisive constraint is moving from chips toward power delivery, but announced megawatts are not the same as connected capacity.\n\nCounter-thesis: demand forecasts may double-count projects or assume utilization that never arrives. The article must test both.' },
+      { name: 'Financial Analyst', file: '04_financial_analyst.md', title: 'Economics and sensitivity', text: 'Separate regulated utility returns, merchant generation exposure, transmission investment, and equipment suppliers.\n\nModel base, upside, and downside cases. State the period, currency, source, and formula for every derived figure. Do not equate backlog with recognized revenue.' },
+      { name: 'Competitor Monitor', file: '05_competitor_monitor.md', title: 'Competitive narratives', text: 'Compare how utilities, hyperscalers, equipment vendors, regulators, and specialist outlets frame the bottleneck.\n\nMap consensus, disagreements, and missing questions. Avoid ranking unlike markets or analytical dimensions on one scale.' },
+      { name: 'Beneficial Related', file: '06_beneficial_related.md', title: 'Impact chain', text: 'Trace the transmission mechanism: compute demand → contracted load → interconnection → generation and grid buildout → equipment orders → recognized revenue.\n\nName beneficiaries or losers only when this mechanism and its timing are supported.' },
+      { name: 'PSC Engine', file: '07_psc.md', title: 'Claim verification', text: 'Verdicts: verified, qualified, disputed, unverified, or false.\n\nCheck each material claim against primary evidence or genuinely independent reporting. Two articles repeating one anonymous source are not two-source verification.' },
+      { name: 'Writer', file: '08_writer.md', title: 'Complete draft', text: 'Write the change, stakes, evidence, countercase, and implications as one readable argument.\n\nAttribute numbers precisely. Preserve uncertainty. End with the signals that would confirm or weaken the thesis.' },
+      { name: 'Editor', file: '09_editor.md', title: 'Publication decision', text: 'Decision: publish, revise, or hold.\n\nAudit names, dates, units, currencies, links, quotations, calculations, and headline proportionality. Return unresolved claims to the relevant stage instead of forcing completion.' }
+    ];
+
+    const rail = document.getElementById('rail');
+    const stageList = document.getElementById('stageList');
+    const start = document.getElementById('start');
+    const stream = document.getElementById('stream');
+    const artifactFile = document.getElementById('artifactFile');
+    const artifactState = document.getElementById('artifactState');
+    const artifactTitle = document.getElementById('artifactTitle');
+    const counter = document.getElementById('counter');
+    const runStatus = document.getElementById('runStatus');
+    let active = 0;
+    let complete = 0;
+    let timer = null;
+
+    stages.forEach((stage, index) => {
+      const railItem = document.createElement('div');
+      railItem.className = 'rail-step';
+      railItem.innerHTML = `<strong>0${index + 1}</strong><span>${stage.name}</span><i aria-hidden="true"></i>`;
+      rail.appendChild(railItem);
+
+      const button = document.createElement('button');
+      button.className = 'stage-button';
+      button.innerHTML = `<b>0${index + 1}</b><span>${stage.name}</span>`;
+      button.addEventListener('click', () => showStage(index, false));
+      stageList.appendChild(button);
+    });
+
+    function updateNav() {
+      [...rail.children].forEach((item, index) => {
+        item.classList.toggle('active', index === active);
+        item.classList.toggle('done', index < complete);
+      });
+      [...stageList.children].forEach((item, index) => {
+        item.classList.toggle('current', index === active);
+        item.classList.toggle('complete', index < complete);
+      });
+      counter.textContent = `${complete} / 9`;
+    }
+
+    function typeText(text, done) {
+      clearInterval(timer);
+      stream.textContent = '';
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      stream.appendChild(cursor);
+      let position = 0;
+      timer = setInterval(() => {
+        const amount = Math.max(2, Math.ceil(text.length / 110));
+        position = Math.min(text.length, position + amount);
+        stream.firstChild && stream.removeChild(stream.firstChild);
+        stream.append(document.createTextNode(text.slice(0, position)), cursor);
+        if (position >= text.length) {
+          clearInterval(timer);
+          cursor.remove();
+          done();
+        }
+      }, 16);
+    }
+
+    function showStage(index, animate) {
+      active = index;
+      const stage = stages[index];
+      artifactFile.textContent = stage.file;
+      artifactTitle.textContent = stage.title;
+      artifactState.textContent = index < complete ? 'complete' : animate ? 'streaming' : 'preview';
+      updateNav();
+      if (animate) {
+        typeText(stage.text, () => {
+          complete = Math.max(complete, index + 1);
+          artifactState.textContent = 'complete';
+          updateNav();
+          if (index < stages.length - 1) {
+            setTimeout(() => showStage(index + 1, true), 260);
+          } else {
+            start.disabled = false;
+            start.textContent = 'Run again →';
+            runStatus.textContent = 'Complete · 9 Markdown artifacts ready';
+          }
+        });
+      } else {
+        clearInterval(timer);
+        stream.textContent = stage.text;
+      }
+    }
+
+    start.addEventListener('click', () => {
+      complete = 0;
+      active = 0;
+      start.disabled = true;
+      start.textContent = 'Auditing…';
+      runStatus.textContent = 'Running · stage outputs stream as they complete';
+      document.getElementById('audit').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showStage(0, true);
+    });
+
+    updateNav();
+  </script>
+</body>
+</html>

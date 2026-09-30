@@ -1,213 +1,128 @@
-# COREMI 科睿 — AI-Native Newsroom & Investment Intelligence System
+# COREMI 科睿
 
-> *"Business is not a sale but a reshaping of destinies."*
+> **Judge the future.**
 
-**One journalist. One system. The world's information, restructured.**
+COREMI is an open-source, AI-native newsroom and investment-research workflow. It turns a question, lead, company, or market signal into a nine-stage, source-aware audit trail and a publishable draft.
 
-COREMI is an open-source, multi-agent AI system built to replace an entire newsroom — fetching, analyzing, writing, verifying, and publishing financial and technology news at Bloomberg speed, with Reuters accuracy, and WSJ storytelling quality.
+科睿是一套开源的AI原生新闻编辑部与投资研究工作流。它把一个问题、新闻线索、公司或市场信号，转化为九步可追溯的研究过程和可交付稿件。
 
-Born in Silicon Valley, January 2026.
+[Live workflow](https://news.coremi.ai) · [Interactive demo](./index.html) · [Vision](./VISION.md) · [Roadmap](./ROADMAP.md) · [Contributing](./CONTRIBUTING.md)
 
----
+## Why COREMI
 
-## 🌐 English | [中文](#中文介绍)
+Most AI research tools only show the answer. COREMI keeps the work visible:
 
-### What is COREMI?
+- every stage writes a readable Markdown artifact;
+- claims are separated from evidence and assumptions;
+- weak or conflicting sources remain visible instead of being silently merged;
+- the final article can be traced back to the research that produced it;
+- a failed stage does not erase completed work.
 
-COREMI (科睿) is a **10-module multi-agent system** — not a simple pipeline, but a network of specialized AI agents that collaborate, cross-verify, and iterate — designed to:
+This repository contains the public workflow specification, prompt templates, a small local run manager, and an interactive audit-flow demo. It does **not** contain production credentials, private research, customer data, or payment infrastructure.
 
-- 📡 **Fetch** news from 20+ elite global sources (WSJ, FT, Reuters, Caixin, The Economist...)
-- 🔍 **Pitch** — score, select, and identify the highest-value stories for investors and decision-makers
-- 💹 **Analyze** companies financially (DCF, 5-year trends, CFA-standard)
-- ✍️ **Write** in WSJ narrative style + Xinhua precision + Economist macro insight
-- ✅ **Verify** every fact with dual-source cross-validation (PSC method)
-- 📤 **Publish** to WeChat, Xiaohongshu, TikTok, CBN — in seconds
+## The Nine-Step Audit Flow
 
-**Target**: 300 pieces of intelligence published per day. 2 staff. Sub-minute latency.
+| Step | Agent | Question answered | Artifact |
+|---:|---|---|---|
+| 1 | Soul | What are we trying to understand, and for whom? | `01_soul.md` |
+| 2 | News Fetcher | What primary and high-quality sources exist? | `02_fetcher.md` |
+| 3 | Pitch | Why does this matter now? | `03_pitch.md` |
+| 4 | Financial Analyst | What do the numbers imply? | `04_financial_analyst.md` |
+| 5 | Competitor Monitor | How are rivals and other outlets framing it? | `05_competitor_monitor.md` |
+| 6 | Beneficial Related | Who benefits, who pays, and through which chain? | `06_beneficial_related.md` |
+| 7 | PSC Engine | Which claims survive cross-verification? | `07_psc.md` |
+| 8 | Writer | What is the complete, readable argument? | `08_writer.md` |
+| 9 | Editor | Is it accurate, coherent, and ready to publish? | `09_editor.md` |
 
----
+`00_index.md` is the run ledger. It records status, timestamps, and artifact paths. JSON may be used internally, but the public contract is human-readable Markdown.
 
-## 🏗️ System Architecture — 10 Modules
+## Quick Start
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    COREMI Multi-Agent System                 │
-│                                                             │
-│  [1] Soul.md ──────── Unified editorial mind & values       │
-│       │                                                     │
-│  [2] News Fetcher ─── 20+ sources, RSS + API, scored        │
-│       │                                                     │
-│  [3] Pitch ────────── Story selection, 5W1H, value score    │
-│       │                                                     │
-│  [4] Financial ────── DCF, 5Y trend, CFA-standard analysis  │
-│  [5] Competitor ───── How rivals covered the same story     │
-│  [6] Beneficial ───── Related stocks: US/HK/A/DE/JP/UK      │
-│       │                                                     │
-│  [7] Writer ───────── Inverted pyramid, killer lede         │
-│  [8] Editor ───────── Standards check, CN↔EN alignment      │
-│       │                                                     │
-│  [9] PSC ──────────── Cross-verification, source database   │
-│       │                                                     │
-│  [10] Router ──────── Publish matrix: style, author, date   │
-│                                                             │
-│         ↕ Multi-agent, not pipeline. Agents re-call         │
-│           each other. e.g. NVDA → Samsung/Hynix → re-fetch  │
-└─────────────────────────────────────────────────────────────┘
-```
+Requirements: Python 3.9+. The run manager uses only the Python standard library.
 
----
+```bash
+git clone https://github.com/YUANLU007/coremi.git
+cd coremi
 
-## 🚀 Workflows
+# Create an auditable run directory
+python3 coremi.py new "How will AI data-center power demand reshape utilities?" \
+  --source "https://example.com/source"
 
-| Workflow | Modules Used | Output | Depth |
-|----------|-------------|--------|-------|
-| `#newspress` | Fetcher + Pitch + Writer | 8 posts, 800 words, 6am | Fast |
-| `#researcher` | All 10 | 5000-word industry report | Deep |
-| `#trader` | Financial + Competitor + Beneficial | Portfolio strategy | Expert |
+# Inspect all runs or one run
+python3 coremi.py status
+python3 coremi.py status data/<run-directory>
 
----
-
-## 📁 Repository Structure
-
-```
-coremi/
-├── README.md
-├── VISION.md              # Founder story & market thesis
-├── ROADMAP.md             # What's built, what's needed
-├── CONTRIBUTING.md        # How to join
-├── prompts/               # Core prompts for each module
-│   ├── 01-soul.md
-│   ├── 02-news-fetcher.md
-│   ├── 03-pitch.md
-│   ├── 04-financial-analyst.md
-│   ├── 05-competitor.md
-│   ├── 06-beneficial-stocks.md
-│   ├── 07-writer.md
-│   ├── 08-editor.md
-│   ├── 09-psc.md
-│   └── 10-router.md
-├── docs/
-│   ├── architecture.md
-│   ├── source-list.md     # Verified source list (20+)
-│   └── examples/          # Real system outputs
-└── src/                   # Code (Python, CLI-first)
-    ├── fetcher/
-    ├── pitch/
-    ├── writer/
-    └── router/
+# See the next stage and its prompt
+python3 coremi.py next data/<run-directory>
 ```
 
----
+The CLI does not pretend to be an LLM. It creates and validates the audit trail; you can execute the prompts with the model or agent environment you choose.
 
-## 🛠️ Tech Stack
+## Run Directory
 
-- **Language**: Python 3, CLI-first
-- **AI**: Claude API (multi-agent orchestration)
-- **Data**: feedparser, Reuters RSS, Futu API, Tonghuashun
-- **Publish**: WeChat API, Xiaohongshu, TikTok
-- **Architecture**: Multi-agent (not pipeline) — agents can re-invoke each other
+```text
+data/20260930_160704_ai-data-center-power/
+├── 00_index.md
+├── 00_request.md
+├── 01_soul.md
+├── 02_fetcher.md
+├── 03_pitch.md
+├── 04_financial_analyst.md
+├── 05_competitor_monitor.md
+├── 06_beneficial_related.md
+├── 07_psc.md
+├── 08_writer.md
+└── 09_editor.md
+```
 
----
+See [docs/ARTIFACT_CONTRACT.md](./docs/ARTIFACT_CONTRACT.md) for the file contract and completion rules.
 
-## 🤝 We Need You
+## Prompts
 
-COREMI is **architecture-complete** but code-hungry. The 10-module design is defined. Now we build.
+The core prompt pack lives in [`prompts/`](./prompts):
 
-**Open Issues — Good First Tasks:**
+```text
+01-soul.md
+02-news-fetcher.md
+03-pitch.md
+04-financial-analyst.md
+05-competitor-monitor.md
+06-beneficial-related.md
+07-psc.md
+08-writer.md
+09-editor.md
+```
 
-| Module | Task | Skill Needed |
-|--------|------|-------------|
-| News Fetcher | RSS ingestion + scoring engine | Python, feedparser |
-| Financial Analyst | Futu API integration | Python, finance API |
-| Writer | Prompt-to-article pipeline | Python, LLM API |
-| Router | Multi-platform publisher | Python, WeChat/API |
-| Editor UI | Web newsroom interface | React/Next.js |
-| PSC | Cross-verification logic | Python, NLP |
+[`11-lab-chain.md`](./prompts/11-lab-chain.md) remains available as an experimental extension for tracking real procurement and adoption signals. It is not part of the fixed nine-step contract.
 
-→ See [CONTRIBUTING.md](./CONTRIBUTING.md) to get started
-→ Browse [open issues](../../issues)
+## Editorial Rules
 
----
+1. Prefer primary sources, filings, regulators, company statements, and direct interviews.
+2. Label fact, inference, estimate, and forecast separately.
+3. A link is not evidence until the underlying claim is checked.
+4. Preserve disagreement between credible sources.
+5. Do not fabricate missing numbers, quotes, dates, or attribution.
+6. The final draft must include limitations and what would change the conclusion.
 
-## 💡 For Investors
+## What This Release Changes
 
-COREMI addresses a **$30B+ market** (financial intelligence, Bloomberg Terminal alone: $6B/year).
+The `2026.09` release replaces the earlier ten-module architecture with a fixed nine-step audit flow. It also replaces JSON-first promises with Markdown-first artifacts, removes the publishing router from the core research contract, and makes progress and failure states explicit.
 
-**The gap**: Bloomberg costs $25,000/year per seat. COREMI aims to deliver 80% of the intelligence at 1% of the cost — with AI agents doing the labor.
+See [CHANGELOG.md](./CHANGELOG.md) for details.
 
-**Traction**: Full architecture designed, source list validated, prompts tested in production by the founder across 10+ stories published in CBN and FT Chinese.
+## Founder
 
-**Contact for investment inquiries**: [Add your email here]
+COREMI was created by **Lu Yuan (陆媛)**, an investigative journalist and Silicon Valley technology observer.
 
----
+- [Google Scholar](https://scholar.google.com/citations?view_op=list_works&hl=zh-CN&user=wAi9MdkAAAAJ)
+- [第一财经作者主页](https://www.yicai.com/author/100008939.html)
 
-## 👤 Founder
+## License
 
-**Lu Yuan (陆媛)** — Investigative journalist, Silicon Valley Observer Editor.
-
-- Former Senior Editor, China Business News (第一财经)
-- Silicon Valley-based since 2024
-- Author & Google Scholar: [scholar.google.com/citations?user=wAi9MdkAAAAJ](https://scholar.google.com/citations?view_op=list_works&hl=zh-CN&user=wAi9MdkAAAAJ)
-- Published column: [yicai.com/author/100008939.html](https://www.yicai.com/author/100008939.html)
-
-*"I am a journalist who decided to build the newsroom I always wished existed."*
-
----
-
-## 📄 License
-
-MIT License — open for contribution, attribution appreciated.
-
----
-
----
-
-## 中文介绍
-
-# COREMI 科睿 — AI原生新闻编辑部与投资情报系统
-
-**一个记者。一套系统。重构全球信息流。**
-
-科睿（COREMI）是一个开源的**10模块多智能体系统**——不是简单的pipeline，而是多个专业AI智能体协同工作、交叉验证、反复迭代——目标是：
-
-- 以彭博社的速度、路透社的准确性、华尔街日报的叙事质量，完成新闻生产全流程
-- 两个员工，每天发布300条资讯
-- 秒级发布，全球多平台分发
-
-### 系统起源
-
-2026年1月，硅谷。
-
-作为在第一财经工作多年的调查记者，我一直在想：**如何把人对金融财经商业信息的需求AI化？**
-
-不是替代记者，而是让一个记者能做整个编辑部的工作。
-
-于是有了科睿。
-
-### 10个模块
-
-| 编号 | 模块 | 功能 |
-|------|------|------|
-| 1 | Soul.md | 统一编辑心智与价值观 |
-| 2 | News Fetcher | 抓取20+权威信源新闻 |
-| 3 | Pitch | 新闻价值评估与选题 |
-| 4 | Financial Analyst | 财务分析，DCF，CFA标准 |
-| 5 | Competitor | 竞品报道对比分析 |
-| 6 | Beneficial Stocks | 相关上市公司（美股/A股/港股/德股） |
-| 7 | Writer | 倒金字塔写作，华尔街日报叙事风格 |
-| 8 | Editor | 编辑审核，中英文对齐 |
-| 9 | PSC | 双信源交叉验证 |
-| 10 | Router | 多平台发布（公号/小红书/抖音/CBN） |
-
-### 我们需要
-
-- Python 后端开发者
-- LLM应用工程师
-- 新闻/金融领域专家（验证输出质量）
-- 投资人（天使/种子轮）
-
-**投资/合作联系**：[填写你的邮件]
+[MIT](./LICENSE). Contributions are welcome. Editorial claims and third-party source material remain subject to their original rights and verification requirements.
 
 ---
 
-*独立 · 独家 · 独到*
+**独立 · 独家 · 独到**
+
+Independent · Exclusive · Insightful

@@ -1,71 +1,42 @@
-# ROADMAP
+# COREMI Roadmap
 
-## Status Legend
-- ✅ Complete
-- 🔨 In Progress
-- 📋 Spec Ready, Needs Builder
-- 💡 Concept Stage
+The roadmap distinguishes what is usable today from what is experimental. A checked item means it exists in this repository and can be inspected; it does not imply production deployment.
 
----
+## 2026.09 - Public Audit Contract
 
-## Phase 1 — Foundation (Now)
+- [x] Fixed nine-step workflow and numbered Markdown artifacts
+- [x] Run ledger with resumable status
+- [x] Public prompt pack for all nine stages
+- [x] Dependency-free local run manager
+- [x] Responsive audit-flow demo
+- [x] Contribution and repository-safety guidance
 
-| Module | Status | Notes |
-|--------|--------|-------|
-| System Architecture (V5) | ✅ | 10-module multi-agent design complete |
-| Editorial Soul (prompts) | ✅ | Values, tone, style defined |
-| Source List (20+ outlets) | ✅ | Validated in production |
-| News Fetcher (prompts) | ✅ | Reuters RSS + scoring logic defined |
-| Pitch Module (prompts) | ✅ | 5W1H + value scoring + interview angles |
-| Financial Analyst (prompts) | ✅ | DCF, 5Y trend, CFA standard |
-| Writer Module (prompts) | ✅ | WSJ narrative + inverted pyramid |
-| News Fetcher (code) | 📋 | Python, feedparser, JSON output |
-| Pitch Module (code) | 📋 | Scoring engine, CLI |
-| Financial Analyst (code) | 📋 | Futu API integration |
+## Next - Evidence Tooling
 
----
+- [ ] Source manifest with canonical URL and archive support
+- [ ] Claim extractor that proposes PSC rows from a draft
+- [ ] Link, date, and citation validator
+- [ ] Duplicate-source and circular-citation detection
+- [ ] Reproducible financial-calculation notebooks
+- [ ] Public, rights-cleared example run
 
-## Phase 2 — Core Pipeline (Next 3 months)
+## Later - Interoperability
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| `#newspress` workflow end-to-end | 📋 | Fetch → Pitch → Write → Publish |
-| Futu API financial data pull | 📋 | 48hr financial statements |
-| PSC cross-verification engine | 📋 | Dual-source validation |
-| Editor module (CN↔EN alignment) | 📋 | Translation quality check |
-| Router — WeChat publish | 📋 | WeChat Official Account API |
-| Web newsroom UI | 💡 | React, collaborative editing |
+- [ ] Provider-neutral adapters for model and search tools
+- [ ] Export to DOCX and PDF with citation appendix
+- [ ] Machine-readable sidecar files generated from Markdown
+- [ ] Local-first browser interface for editing stage artifacts
+- [ ] Optional collaboration and review protocol
 
----
+## Experimental Extensions
 
-## Phase 3 — Intelligence Layer (Months 4–6)
+- Lab Chain procurement and adoption tracking
+- Trading and portfolio research workflows
+- Expert-voice retrieval from social and specialist communities
+- Multilingual publication workflows
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| `#researcher` workflow | 💡 | 5000-word industry reports |
-| `#trader` workflow | 💡 | Portfolio strategy output |
-| Beneficial stocks module | 💡 | 7-layer AI model, 6 markets |
-| Competitor analysis module | 💡 | How rivals covered the story |
-| Multi-platform router | 💡 | Xiaohongshu, TikTok, CBN |
-| Cron scheduler (daily 9am) | 💡 | Automated morning briefing |
+Experimental extensions do not change the fixed nine-step artifact contract unless a versioned proposal is accepted.
 
----
+## Contribution Priorities
 
-## Phase 4 — Scale (Months 7–12)
-
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Multilingual output (EN/CN/DE) | 💡 | |
-| Institutional API access | 💡 | B2B intelligence product |
-| Community source validation | 💡 | Crowdsourced source rating |
-| Mobile app | 💡 | Personal intelligence assistant |
-
----
-
-## Want to Build Something?
-
-Every 📋 item above is waiting for a builder.
-
-Check [open issues](../../issues) — each maps to one of these roadmap items.
-
-Or propose something new — open a Discussion.
+The best first contributions improve verifiability, portability, or documentation. Open an issue describing the user problem, evidence, expected behavior, and a small test case before proposing a large architectural change.
