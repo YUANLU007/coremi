@@ -1,69 +1,142 @@
-# COREMI 科睿
+# News Harness
 
-> **Judge the future.**
+## Harness Engineering for AI Newsrooms
 
-COREMI is an open-source, AI-native newsroom and investment-research workflow. It turns a question, lead, company, or market signal into a nine-stage, source-aware audit trail and a publishable draft.
+News Harness is an open-source control layer for AI-assisted journalism and investment research. It defines what an agent may read, what it must produce, when it may advance, how evidence is graded, and where human judgment remains mandatory.
 
-科睿是一套开源的AI原生新闻编辑部与投资研究工作流。它把一个问题、新闻线索、公司或市场信号，转化为九步可追溯的研究过程和可交付稿件。
+News Harness是一套面向AI新闻编辑部与投资研究的开源控制层。它不追求再造一个更会写字的模型，而是规定智能体可以读取什么、必须留下什么、何时能够进入下一步、证据如何分级，以及哪些判断必须由人负责。
 
-[Live workflow](https://news.coremi.ai) · [Interactive demo](./index.html) · [Vision](./VISION.md) · [Roadmap](./ROADMAP.md) · [Contributing](./CONTRIBUTING.md)
+Built by [Coremi](https://news.coremi.ai).
 
-## Why COREMI
+[Interactive demo](https://yuanlu007.github.io/coremi/) · [Harness specification](./docs/HARNESS_ENGINEERING.md) · [Vision](./VISION.md) · [Roadmap](./ROADMAP.md) · [Contributing](./CONTRIBUTING.md)
 
-Most AI research tools only show the answer. COREMI keeps the work visible:
+## The Core Idea
 
-- every stage writes a readable Markdown artifact;
-- claims are separated from evidence and assumptions;
-- weak or conflicting sources remain visible instead of being silently merged;
-- the final article can be traced back to the research that produced it;
-- a failed stage does not erase completed work.
+Models are becoming interchangeable. Reliable work is not.
 
-This repository contains the public workflow specification, prompt templates, a small local run manager, and an interactive audit-flow demo. It does **not** contain production credentials, private research, customer data, or payment infrastructure.
+In an agentic newsroom, the model is only one component. The surrounding harness determines whether the system:
 
-## The Nine-Step Audit Flow
+- starts from a precise editorial question;
+- retrieves evidence instead of improvising context;
+- preserves the difference between fact, inference, estimate, and forecast;
+- records state in files that people can inspect;
+- stops when evidence is insufficient;
+- resumes after failure without losing completed work;
+- produces a final article that can be traced back to its sources.
 
-| Step | Agent | Question answered | Artifact |
+This surrounding system is **harness engineering**.
+
+## What Is a News Harness?
+
+A news harness combines six control surfaces:
+
+| Control surface | What it governs |
+|---|---|
+| Context | the question, audience, scope, exclusions, and supplied material |
+| Routing | which research stage runs next and which tools or sources it may use |
+| State | what is pending, active, complete, failed, or returned for revision |
+| Evidence | source levels, claim status, conflicts, calculations, and uncertainty |
+| Artifacts | the readable files each stage must leave behind |
+| Human gates | the decisions that cannot be delegated to model fluency |
+
+News Harness is not a model, a hidden chain of thought, or a generic agent framework. It is the inspectable operating structure around models and tools.
+
+## Reference Harness: Nine Stages
+
+The repository includes a nine-stage reference implementation developed inside Coremi:
+
+| Stage | Responsibility | Required artifact | Gate to advance |
 |---:|---|---|---|
-| 1 | Soul | What are we trying to understand, and for whom? | `01_soul.md` |
-| 2 | News Fetcher | What primary and high-quality sources exist? | `02_fetcher.md` |
-| 3 | Pitch | Why does this matter now? | `03_pitch.md` |
-| 4 | Financial Analyst | What do the numbers imply? | `04_financial_analyst.md` |
-| 5 | Competitor Monitor | How are rivals and other outlets framing it? | `05_competitor_monitor.md` |
-| 6 | Beneficial Related | Who benefits, who pays, and through which chain? | `06_beneficial_related.md` |
-| 7 | PSC Engine | Which claims survive cross-verification? | `07_psc.md` |
-| 8 | Writer | What is the complete, readable argument? | `08_writer.md` |
-| 9 | Editor | Is it accurate, coherent, and ready to publish? | `09_editor.md` |
+| 1. Soul | define audience, decision, scope, and risk | `01_soul.md` | research mandate is explicit |
+| 2. News Fetcher | build a ranked source and claim map | `02_fetcher.md` | material claims have evidence leads |
+| 3. Pitch | choose a useful, supportable thesis | `03_pitch.md` | angle survives the counter-thesis |
+| 4. Financial Analyst | test economics, calculations, and sensitivity | `04_financial_analyst.md` | periods, units, assumptions are disclosed |
+| 5. Competitor Monitor | compare companies and competing narratives | `05_competitor_monitor.md` | consensus and omissions are visible |
+| 6. Beneficial Related | map impact through the value chain | `06_beneficial_related.md` | each beneficiary has a mechanism |
+| 7. PSC Engine | verify claims one by one | `07_psc.md` | publishable wording is defined |
+| 8. Writer | turn verified material into a complete argument | `08_writer.md` | draft does not outrun the evidence |
+| 9. Editor | correct, return, hold, or publish | `09_editor.md` | a human-readable decision is recorded |
 
-`00_index.md` is the run ledger. It records status, timestamps, and artifact paths. JSON may be used internally, but the public contract is human-readable Markdown.
+The stages may loop. Financial analysis can send the harness back to retrieval; PSC can bar a claim; the Editor can return the draft to any earlier stage. The numbered artifacts remain stable even when the execution path is not linear.
+
+## Architecture
+
+```text
+Question or lead
+      │
+      ▼
+┌──────────────────────────────────────────────┐
+│ CONTEXT HARNESS                              │
+│ request · audience · scope · source material │
+└──────────────────────┬───────────────────────┘
+                       ▼
+┌──────────────────────────────────────────────┐
+│ WORK HARNESS                                 │
+│ nine stages · tool routing · resumable state │
+└──────────────────────┬───────────────────────┘
+                       ▼
+┌──────────────────────────────────────────────┐
+│ EVIDENCE HARNESS                             │
+│ source levels · claim ledger · PSC verdicts  │
+└──────────────────────┬───────────────────────┘
+                       ▼
+┌──────────────────────────────────────────────┐
+│ DELIVERY HARNESS                             │
+│ draft · editorial decision · final artifact  │
+└──────────────────────────────────────────────┘
+```
+
+Read [Harness Engineering](./docs/HARNESS_ENGINEERING.md) for the design principles and component contract.
 
 ## Quick Start
 
-Requirements: Python 3.9+. The run manager uses only the Python standard library.
+Requirements: Python 3.9+. The local run manager uses only the Python standard library.
 
 ```bash
 git clone https://github.com/YUANLU007/coremi.git
 cd coremi
 
-# Create an auditable run directory
-python3 coremi.py new "How will AI data-center power demand reshape utilities?" \
+# Create a harness run
+python3 news_harness.py new \
+  "How will AI data-center power demand reshape utilities?" \
   --source "https://example.com/source"
 
-# Inspect all runs or one run
-python3 coremi.py status
-python3 coremi.py status data/<run-directory>
+# Inspect state and locate the next gate
+python3 news_harness.py status
+python3 news_harness.py next data/<run-directory>
 
-# See the next stage and its prompt
-python3 coremi.py next data/<run-directory>
+# Record a completed stage artifact
+python3 news_harness.py record data/<run-directory> 1 path/to/01_soul.md
 ```
 
-The CLI does not pretend to be an LLM. It creates and validates the audit trail; you can execute the prompts with the model or agent environment you choose.
+The runner does not pretend to be an LLM. It creates the state and artifact contract. You choose the model, search system, coding agent, or human collaborator that executes each stage.
 
-## Run Directory
+`coremi.py` remains as a compatibility entry point and forwards to the same runner.
+
+## Repository Map
 
 ```text
-data/20260930_160704_ai-data-center-power/
-├── 00_index.md
+coremi/
+├── news_harness.py              # dependency-free run and state manager
+├── coremi.py                    # compatibility entry point
+├── prompts/                     # nine public stage specifications
+├── docs/
+│   ├── HARNESS_ENGINEERING.md   # architecture and design principles
+│   ├── ARTIFACT_CONTRACT.md     # files, evidence labels, completion rules
+│   └── SECURITY.md              # public/private repository boundary
+├── data/.gitkeep                # local runs are ignored by Git
+├── index.html                   # interactive harness demo
+├── VISION.md
+├── ROADMAP.md
+└── CONTRIBUTING.md
+```
+
+## A Run Is a Durable Record
+
+```text
+data/20261001_103000_ai-data-center-power/
 ├── 00_request.md
+├── 00_index.md
 ├── 01_soul.md
 ├── 02_fetcher.md
 ├── 03_pitch.md
@@ -75,54 +148,36 @@ data/20260930_160704_ai-data-center-power/
 └── 09_editor.md
 ```
 
-See [docs/ARTIFACT_CONTRACT.md](./docs/ARTIFACT_CONTRACT.md) for the file contract and completion rules.
+`00_index.md` is the state ledger. A file is not complete merely because it exists; it must satisfy the stage contract. JSON may be used internally, but the public interface is readable Markdown.
 
-## Prompts
+## Design Principles
 
-The core prompt pack lives in [`prompts/`](./prompts):
+1. **Artifacts over memory.** Important state survives outside a model conversation.
+2. **Evidence before eloquence.** Fluency cannot upgrade a weak source.
+3. **Visible gates over silent automation.** Advancement has explicit conditions.
+4. **Loops over forced linearity.** A later stage can reopen earlier research.
+5. **Failure is state.** A failed stage is recorded, diagnosable, and resumable.
+6. **Provider neutrality.** Models and search tools can change without changing the public contract.
+7. **Human accountability.** Publication remains an editorial decision.
 
-```text
-01-soul.md
-02-news-fetcher.md
-03-pitch.md
-04-financial-analyst.md
-05-competitor-monitor.md
-06-beneficial-related.md
-07-psc.md
-08-writer.md
-09-editor.md
-```
+## Public Boundary
 
-[`11-lab-chain.md`](./prompts/11-lab-chain.md) remains available as an experimental extension for tracking real procurement and adoption signals. It is not part of the fixed nine-step contract.
+This repository contains the harness specification, prompts, runner, and demonstration interface. It does not contain production credentials, payment systems, customer data, unpublished source material, or Coremi's private research archive.
 
-## Editorial Rules
+## Project Relationship
 
-1. Prefer primary sources, filings, regulators, company statements, and direct interviews.
-2. Label fact, inference, estimate, and forecast separately.
-3. A link is not evidence until the underlying claim is checked.
-4. Preserve disagreement between credible sources.
-5. Do not fabricate missing numbers, quotes, dates, or attribution.
-6. The final draft must include limitations and what would change the conclusion.
+**Coremi** is the newsroom and judgment-intelligence product. **News Harness** is its open-source harness-engineering layer. The repository is maintained by **Lu Yuan (陆媛)**, an investigative journalist and Silicon Valley technology observer.
 
-## What This Release Changes
-
-The `2026.09` release replaces the earlier ten-module architecture with a fixed nine-step audit flow. It also replaces JSON-first promises with Markdown-first artifacts, removes the publishing router from the core research contract, and makes progress and failure states explicit.
-
-See [CHANGELOG.md](./CHANGELOG.md) for details.
-
-## Founder
-
-COREMI was created by **Lu Yuan (陆媛)**, an investigative journalist and Silicon Valley technology observer.
-
+- [Coremi live workflow](https://news.coremi.ai)
 - [Google Scholar](https://scholar.google.com/citations?view_op=list_works&hl=zh-CN&user=wAi9MdkAAAAJ)
 - [第一财经作者主页](https://www.yicai.com/author/100008939.html)
 
 ## License
 
-[MIT](./LICENSE). Contributions are welcome. Editorial claims and third-party source material remain subject to their original rights and verification requirements.
+[MIT](./LICENSE). Contributions are welcome. Third-party sources and editorial material remain subject to their original rights and verification requirements.
 
 ---
 
-**独立 · 独家 · 独到**
+**News Harness**
 
-Independent · Exclusive · Insightful
+Harness Engineering for AI Newsrooms

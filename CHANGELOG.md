@@ -1,6 +1,23 @@
 # Changelog
 
-All notable public changes to COREMI are documented here.
+All notable public changes to News Harness are documented here.
+
+## 2026.10 - News Harness
+
+### Reframed
+
+- Renamed the open-source project layer **News Harness**.
+- Defined the discipline as **Harness Engineering for AI Newsrooms**.
+- Positioned the nine-stage Coremi workflow as a reference harness rather than the entire definition of the project.
+- Separated model capability from context, routing, state, evidence, artifacts, recovery, and human gates.
+
+### Added
+
+- A full harness-engineering specification for agentic newsroom systems.
+- A provider-neutral architecture and evaluation direction.
+- Explicit failure, return, hold, and resume states.
+- A `news_harness.py` entry point while preserving `coremi.py` compatibility.
+- A redesigned interactive demo centered on harness state and stage gates.
 
 ## 2026.09 - Nine-Step Audit Flow
 

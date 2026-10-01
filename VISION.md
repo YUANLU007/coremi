@@ -1,107 +1,92 @@
-# VISION - Why COREMI Exists
+# Vision
 
-## The Problem
+## News Needs More Than a Better Model
 
-The world produces more financial and technology news than any human team can process.
+Language models can summarize, draft, compare, and calculate. None of those capabilities automatically creates trustworthy journalism.
 
-Yet the tools to navigate it are either:
-- **Too expensive**: Bloomberg Terminal costs $25,000/seat/year. Only institutions can afford it.
-- **Too shallow**: Social feeds optimized for engagement, not intelligence.
-- **Too slow**: Traditional newsrooms take hours to publish what markets need in minutes.
+A newsroom must still decide:
 
-Meanwhile, the most important stories — the ones that move capital, reshape industries, change lives — require:
-1. Deep sourcing across 20+ global outlets
-2. Financial analysis at CFA standard
-3. Cross-verification of every number
-4. Translation and localization for global audiences
-5. Distribution across multiple platforms simultaneously
+- which question is worth answering;
+- which sources deserve authority;
+- what a number actually measures;
+- where two accounts conflict;
+- which inference is fair;
+- when the evidence is too weak to publish;
+- who is accountable for the final judgment.
 
-No single journalist can do this. No small team can afford to.
+These are operating decisions, not text-generation features.
 
-**Until now.**
+## The Harness Engineering Thesis
 
----
+As models improve, the durable advantage moves outward from the model itself to the system around it.
 
-## The Origin Story
+For software agents, that surrounding system is often called a harness: the context, tools, permissions, state, checks, outputs, and recovery paths that turn model capability into dependable work.
 
-January 2026. Silicon Valley.
+**News Harness applies harness engineering to journalism and investment research.**
 
-I had spent years as a senior investigative journalist at China Business News (第一财经), covering technology, finance, and the intersection of capital and power across China and the US.
+The objective is not to reveal a model's private reasoning. The objective is to preserve the work a newsroom actually needs to inspect: sources, claims, calculations, disagreements, decisions, revisions, and final accountability.
 
-I moved to Silicon Valley and watched the AI revolution unfold in real time — not as a spectator, but as someone trying to cover it with the depth it deserved.
+## From Prompt to Institution
 
-The irony was clear: the biggest story of our era was the rise of AI, and the tools available to journalists covering it were still stuck in 2010.
+A prompt can request good behavior. A harness makes good behavior observable and repeatable.
 
-So I asked myself three questions:
+| A prompt says | A harness enforces |
+|---|---|
+| use strong sources | record source level and supported claim |
+| verify the facts | produce claim-level verdicts before drafting |
+| be transparent | save readable artifacts and state transitions |
+| avoid hallucination | stop or qualify when evidence is insufficient |
+| write a balanced article | require a counter-thesis and unresolved risks |
+| improve the answer | return work to the exact stage that failed |
 
-1. **How do you AI-ify the human need for financial and business intelligence?**
-2. **How do you make it strategic and executable — but still feel like co-pilot, not autopilot?**
-3. **How do you build it CLI-first, so it's fast, composable, and auditable?**
+This is how an AI workflow begins to resemble an institution rather than a chat window.
 
-The answer became COREMI.
+## Editorial Judgment Is Not an Error Condition
 
-In 2026, the architecture matured from a list of specialist modules into a fixed nine-step audit flow. The change is important: a research system should not only produce an answer. It should preserve how that answer was reached, where evidence is weak, and which judgment changed at each stage.
+News is not a database query with one mechanically correct output. Evidence can be incomplete, incentives can distort testimony, and material facts can change while a story is being written.
 
----
+News Harness therefore treats uncertainty, disagreement, and editorial return as first-class states. The system can say:
 
-## The Vision
+- verified;
+- qualified;
+- disputed;
+- unverified;
+- false;
+- revise;
+- hold.
 
-**COREMI = Silicon Valley's strongest knowledge base + the world's best wire service.**
+A system that cannot stop is not autonomous. It is uncontrolled.
 
-Named 科睿 (Kē Ruì) — "scientific wisdom" — the system is designed around three editorial values:
+## Why Open Source
 
-> **独立 · 独家 · 独到**
-> *Independent · Exclusive · Insightful*
+The public value is not Coremi's private data or production infrastructure. It is the operating contract that others can inspect, test, criticize, and adapt.
 
-Not just faster news. Better news. News that tells you **what to do next** — whether you're a trader, an entrepreneur, a policymaker, or a curious citizen who wants to understand the world without being manipulated by an algorithm.
+Open sourcing the harness makes several questions discussable:
 
----
-
-## The Market
-
-- Bloomberg Terminal: ~$6B annual revenue, 325,000 subscribers
-- Reuters News Agency: ~$1.8B revenue
-- Financial intelligence market (global): $30B+
-- **Target audience**: The 99% of investors, founders, and professionals who can't afford Bloomberg but need Bloomberg-quality intelligence
-
-COREMI's thesis: **AI can deliver 80% of Bloomberg's intelligence at 1% of the cost.**
-
----
-
-## The Architecture Philosophy
-
-Most AI news tools are pipelines: fetch → write → publish.
-
-COREMI is a **multi-agent network with a stable audit contract**. Agents can re-invoke each other, while every public stage still writes a numbered Markdown artifact.
-
-Example: When analyzing NVIDIA, the Financial Analyst agent identifies Samsung, Hynix, and Micron as key suppliers. It signals the News Fetcher to run a fresh fetch specifically on those companies. The Competitor module checks how SemiAnalysis and The Information covered the same angle. Then Writer synthesizes across all of it.
-
-This is how a great human editor thinks. COREMI keeps that process inspectable, so speed does not erase accountability.
-
----
-
-## The North Star Metric
-
-**A small team with institutional research discipline.**
-
-The goal is not volume for its own sake. Each publishable result should include:
-- Dual-source cross-verification
-- Financial market implications
-- Expert perspective integrated
-- A visible chain from question to final edit
-
----
+- What evidence should an agent need before it may write a claim?
+- Which state belongs in files rather than conversation memory?
+- How should a research run recover after a failed tool call?
+- When should the system ask a human to decide?
+- How can one model be replaced without rewriting the newsroom?
+- How do we evaluate an article and the process that produced it?
 
 ## What Success Looks Like
 
-- COREMI becomes the first AI wire service trusted by institutional investors in China and the US
-- The system covers AI, semiconductors, energy infrastructure, macro finance, and geopolitics
-- Open-source contributions make each module more specialized and accurate
-- The editorial standard: every number real, every claim verified, every story worth reading
+News Harness succeeds when:
+
+1. a small newsroom can run deep research without losing editorial control;
+2. a reviewer can trace a material claim back to its evidence and stage;
+3. a failed run can resume without starting over;
+4. a model or tool can be replaced without breaking the artifact contract;
+5. contributors improve reliability with testable changes, not grander claims;
+6. the final publication still has a responsible human editor.
+
+## Relationship to Coremi
+
+Coremi is a journalism and judgment-intelligence product. News Harness is the open-source harness-engineering layer developed from its newsroom practice.
+
+The product may evolve. The open contract should remain portable.
 
 ---
 
-*"Business is not a sale but a reshaping of destinies."*
-
-— Lu Yuan, Founder, COREMI
-Silicon Valley, 2026
+**The model generates. The harness governs. The editor decides.**

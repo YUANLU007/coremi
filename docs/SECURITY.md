@@ -1,6 +1,6 @@
-# Public Repository Safety
+# News Harness Repository Safety
 
-COREMI's workflow can be open while production operations remain private.
+News Harness can be open while Coremi's production operations remain private.
 
 Do not commit:
 

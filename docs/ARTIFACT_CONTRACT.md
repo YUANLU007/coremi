@@ -1,6 +1,6 @@
-# COREMI Artifact Contract
+# News Harness Artifact Contract
 
-The public COREMI interface is a directory of readable Markdown files. A run can be resumed, inspected, reviewed, or handed to another model without a proprietary database.
+The public News Harness interface is a directory of readable Markdown files. A run can be resumed, inspected, reviewed, or handed to another model without a proprietary database.
 
 ## Required Control Files
 
@@ -11,6 +11,18 @@ Contains the original question, user-provided sources, and requested output. Pre
 ### `00_index.md`
 
 Contains the current run status and links to every stage artifact. The included CLI rebuilds this file from the artifacts present on disk.
+
+## State Model
+
+The reference runner currently derives `pending`, `empty`, and `complete` from the filesystem. A full harness implementation should also preserve:
+
+- `active`: execution has started;
+- `failed`: execution stopped with a recorded cause;
+- `revise`: a later gate returned the artifact;
+- `hold`: an editor blocked advancement;
+- `complete`: the artifact satisfies its gate.
+
+State changes should include a timestamp, actor or provider, reason, and next action. A transition must not erase the earlier artifact.
 
 ## Stage Files
 
@@ -56,3 +68,7 @@ An artifact is not complete merely because a file exists. It must:
 5. avoid invented facts, quotes, numbers, and citations.
 
 The Editor may return a run to an earlier stage. Auditability is more important than forcing a green status.
+
+## Compatibility Rule
+
+Harness implementations may store additional structured state, but they should be able to export the required Markdown artifacts and `00_index.md`. Provider-specific metadata must not become the only way to understand a run.

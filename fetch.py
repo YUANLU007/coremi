@@ -1,5 +1,5 @@
 """
-COREMI Module 2: News Fetcher
+News Harness Reference Stage 2: News Fetcher
 =============================
 Fetches, scores, and filters news from verified sources.
 Output: filtered_news.json — top 15 scored stories.
@@ -131,13 +131,13 @@ def fetch_all(hours: int = 6, top_n: int = 15) -> dict:
 # ─────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="COREMI News Fetcher")
+    parser = argparse.ArgumentParser(description="News Harness reference news fetcher")
     parser.add_argument("--hours",  type=int, default=6,     help="Lookback window in hours")
     parser.add_argument("--top",    type=int, default=15,    help="Number of top stories to return")
     parser.add_argument("--output", type=str, default="filtered_news.json", help="Output JSON file")
     args = parser.parse_args()
 
-    print(f"\n🔍 COREMI News Fetcher — last {args.hours}h\n")
+    print(f"\nNews Harness Fetcher - last {args.hours}h\n")
     result = fetch_all(hours=args.hours, top_n=args.top)
 
     with open(args.output, "w", encoding="utf-8") as f:

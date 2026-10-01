@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="COREMI open-source nine-step newsroom and investment research audit flow.">
-  <title>COREMI | Nine-Step Audit Flow</title>
+  <meta name="description" content="News Harness: open-source harness engineering for AI newsrooms.">
+  <title>News Harness | Harness Engineering for AI Newsrooms</title>
   <style>
     :root {
       --ink: #071b2a;
@@ -50,8 +50,9 @@
       place-items: center;
       border: 1px solid var(--gold);
       color: var(--gold);
-      font-family: var(--serif);
-      font-size: 30px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 800;
       line-height: 1;
     }
     .brand strong { display: block; font-family: var(--serif); font-size: 21px; letter-spacing: 0; }
@@ -187,9 +188,9 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#top" aria-label="COREMI home">
-      <span class="mark" aria-hidden="true">∞</span>
-      <span><strong>Coremi</strong><small>Open audit system</small></span>
+    <a class="brand" href="#top" aria-label="News Harness home">
+      <span class="mark" aria-hidden="true">NH</span>
+      <span><strong>News Harness</strong><small>by Coremi</small></span>
     </a>
     <nav class="toplinks" aria-label="Repository links">
       <a href="./README.md">Documentation</a>
@@ -201,53 +202,53 @@
   <main id="top">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-main">
-        <div class="eyebrow">COREMI · JUDGMENT INTELLIGENCE · 2026.09</div>
-        <h1 id="hero-title">Judge the <em>future.</em></h1>
-        <p class="dek">A visible nine-step newsroom audit, from the first question to the final edit. Keep the evidence, assumptions, disagreement, and judgment in view.</p>
+        <div class="eyebrow">NEWS HARNESS · HARNESS ENGINEERING · 2026.10</div>
+        <h1 id="hero-title">Harness the <em>news.</em></h1>
+        <p class="dek">The open control layer around newsroom agents: context, routing, state, evidence, artifacts, recovery, and human judgment.</p>
         <div class="composer">
           <textarea id="question" aria-label="Research question">How will AI data-center power demand reshape utilities and infrastructure investment?</textarea>
           <div class="composer-footer">
             <span class="hint">Interactive sample. No API key or network request.</span>
-            <button class="primary" id="start">Start audit →</button>
+            <button class="primary" id="start">Run harness →</button>
           </div>
         </div>
       </div>
-      <aside class="hero-side" aria-label="Nine audit stages">
-        <div class="side-title"><h2>Audit trail</h2><span id="counter">0 / 9</span></div>
+      <aside class="hero-side" aria-label="Nine harness stages">
+        <div class="side-title"><h2>Harness gates</h2><span id="counter">0 / 9</span></div>
         <div class="rail" id="rail"></div>
       </aside>
     </section>
 
     <section class="audit" id="audit" aria-labelledby="audit-title">
       <div class="audit-head">
-        <div><div class="eyebrow">VISIBLE WORK, NOT HIDDEN CHAIN OF THOUGHT</div><h2 id="audit-title">Research artifacts</h2></div>
-        <div class="run-status" id="runStatus">Ready · select Start audit</div>
+        <div><div class="eyebrow">CONTEXT · STATE · EVIDENCE · ARTIFACTS · HUMAN GATES</div><h2 id="audit-title">Harness artifacts</h2></div>
+        <div class="run-status" id="runStatus">Ready · select Run harness</div>
       </div>
       <div class="audit-shell">
         <nav class="stage-list" id="stageList" aria-label="Research artifacts"></nav>
         <article class="artifact" aria-live="polite">
           <div class="artifact-meta"><span id="artifactFile">01_soul.md</span><span id="artifactState">waiting</span></div>
           <h3 id="artifactTitle">Research mandate</h3>
-          <div class="stream" id="stream">Start the sample audit to watch each stage produce a readable artifact.</div>
-          <div class="notice">COREMI exposes stage outputs and evidence decisions. It does not expose or claim access to a model's private chain of thought.</div>
+          <div class="stream" id="stream">Run the sample harness to watch each stage satisfy a visible gate and leave a readable artifact.</div>
+          <div class="notice">News Harness exposes work products, state transitions, and evidence decisions. It does not expose or claim access to a model's private chain of thought.</div>
         </article>
       </div>
     </section>
   </main>
 
-  <footer><span>COREMI open-source workflow · MIT License</span><span>Independent · Exclusive · Insightful</span></footer>
+  <footer><span>News Harness · Open source by Coremi · MIT License</span><span>The model generates. The harness governs. The editor decides.</span></footer>
 
   <script>
     const stages = [
-      { name: 'Soul', file: '01_soul.md', title: 'Research mandate', text: 'Audience: investors, operators, and editors evaluating the infrastructure consequences of AI demand.\n\nDecision: distinguish durable grid investment from a short-lived capacity narrative.\n\nScope: power generation, transmission, cooling, and data-center procurement. Separate reported commitments from forecasts.' },
-      { name: 'News Fetcher', file: '02_fetcher.md', title: 'Source map', text: 'Primary evidence to collect: utility filings, interconnection queues, regulator dockets, company capital-expenditure guidance, and data-center power agreements.\n\nOriginal reporting may identify leads, but each material number must be checked against the underlying document and dated.' },
-      { name: 'Pitch', file: '03_pitch.md', title: 'Why this matters now', text: 'Thesis: the decisive constraint is moving from chips toward power delivery, but announced megawatts are not the same as connected capacity.\n\nCounter-thesis: demand forecasts may double-count projects or assume utilization that never arrives. The article must test both.' },
-      { name: 'Financial Analyst', file: '04_financial_analyst.md', title: 'Economics and sensitivity', text: 'Separate regulated utility returns, merchant generation exposure, transmission investment, and equipment suppliers.\n\nModel base, upside, and downside cases. State the period, currency, source, and formula for every derived figure. Do not equate backlog with recognized revenue.' },
-      { name: 'Competitor Monitor', file: '05_competitor_monitor.md', title: 'Competitive narratives', text: 'Compare how utilities, hyperscalers, equipment vendors, regulators, and specialist outlets frame the bottleneck.\n\nMap consensus, disagreements, and missing questions. Avoid ranking unlike markets or analytical dimensions on one scale.' },
-      { name: 'Beneficial Related', file: '06_beneficial_related.md', title: 'Impact chain', text: 'Trace the transmission mechanism: compute demand → contracted load → interconnection → generation and grid buildout → equipment orders → recognized revenue.\n\nName beneficiaries or losers only when this mechanism and its timing are supported.' },
-      { name: 'PSC Engine', file: '07_psc.md', title: 'Claim verification', text: 'Verdicts: verified, qualified, disputed, unverified, or false.\n\nCheck each material claim against primary evidence or genuinely independent reporting. Two articles repeating one anonymous source are not two-source verification.' },
-      { name: 'Writer', file: '08_writer.md', title: 'Complete draft', text: 'Write the change, stakes, evidence, countercase, and implications as one readable argument.\n\nAttribute numbers precisely. Preserve uncertainty. End with the signals that would confirm or weaken the thesis.' },
-      { name: 'Editor', file: '09_editor.md', title: 'Publication decision', text: 'Decision: publish, revise, or hold.\n\nAudit names, dates, units, currencies, links, quotations, calculations, and headline proportionality. Return unresolved claims to the relevant stage instead of forcing completion.' }
+      { name: 'Soul', file: '01_soul.md', title: 'Context gate', text: 'Audience: investors, operators, and editors evaluating the infrastructure consequences of AI demand.\n\nDecision: distinguish durable grid investment from a short-lived capacity narrative.\n\nGate: audience, scope, exclusions, high-risk claims, and definition of done must be explicit before retrieval begins.' },
+      { name: 'News Fetcher', file: '02_fetcher.md', title: 'Retrieval gate', text: 'Primary evidence to collect: utility filings, interconnection queues, regulator dockets, company capital-expenditure guidance, and data-center power agreements.\n\nGate: every material claim has a dated source lead and evidence level. Retrieval alone does not count as verification.' },
+      { name: 'Pitch', file: '03_pitch.md', title: 'Thesis gate', text: 'Thesis: the decisive constraint is moving from chips toward power delivery, but announced megawatts are not the same as connected capacity.\n\nGate: the angle must survive its strongest counter-thesis and remain supportable with evidence already in hand.' },
+      { name: 'Financial Analyst', file: '04_financial_analyst.md', title: 'Calculation gate', text: 'Separate regulated utility returns, merchant generation exposure, transmission investment, and equipment suppliers.\n\nGate: period, currency, source, formula, and assumptions are present for every derived figure. Backlog is not treated as recognized revenue.' },
+      { name: 'Competitor Monitor', file: '05_competitor_monitor.md', title: 'Comparison gate', text: 'Compare how utilities, hyperscalers, equipment vendors, regulators, and specialist outlets frame the bottleneck.\n\nGate: consensus, disagreements, and omissions are visible without ranking unlike markets or analytical dimensions on one scale.' },
+      { name: 'Beneficial Related', file: '06_beneficial_related.md', title: 'Mechanism gate', text: 'Trace the transmission mechanism: compute demand → contracted load → interconnection → generation and grid buildout → equipment orders → recognized revenue.\n\nGate: every beneficiary or loser has a supported mechanism and time horizon.' },
+      { name: 'PSC Engine', file: '07_psc.md', title: 'Evidence gate', text: 'Verdicts: verified, qualified, disputed, unverified, or false.\n\nGate: each material claim has evidence lineage and permitted wording. Two articles repeating one anonymous source are not independent verification.' },
+      { name: 'Writer', file: '08_writer.md', title: 'Draft gate', text: 'Write the change, stakes, evidence, countercase, and implications as one readable argument.\n\nGate: barred claims are absent, numbers are attributed, and uncertainty remains visible.' },
+      { name: 'Editor', file: '09_editor.md', title: 'Human gate', text: 'Decision: publish, revise, or hold.\n\nGate: an accountable editor reviews names, dates, units, currencies, links, quotations, calculations, headline proportionality, and unresolved risk.' }
     ];
 
     const rail = document.getElementById('rail');
@@ -325,7 +326,7 @@
           } else {
             start.disabled = false;
             start.textContent = 'Run again →';
-            runStatus.textContent = 'Complete · 9 Markdown artifacts ready';
+            runStatus.textContent = 'Harness complete · 9 stage gates recorded';
           }
         });
       } else {
@@ -338,8 +339,8 @@
       complete = 0;
       active = 0;
       start.disabled = true;
-      start.textContent = 'Auditing…';
-      runStatus.textContent = 'Running · stage outputs stream as they complete';
+      start.textContent = 'Running harness…';
+      runStatus.textContent = 'Running · state and artifacts stream as gates complete';
       document.getElementById('audit').scrollIntoView({ behavior: 'smooth', block: 'start' });
       showStage(0, true);
     });

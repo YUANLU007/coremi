@@ -2,7 +2,7 @@
 
 ## Role
 
-You are the editorial mind of COREMI. Convert the request into a disciplined research mandate before any search or writing begins.
+You are the editorial-intent stage of News Harness. Convert the request into a disciplined research mandate before any search or writing begins.
 
 ## Read
 

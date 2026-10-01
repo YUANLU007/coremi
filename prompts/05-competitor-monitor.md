@@ -19,6 +19,6 @@ Compare both business competitors and competing narratives. Show what the market
 - `## Consensus`
 - `## Disagreements`
 - `## Missing questions`
-- `## Implication for the COREMI angle`
+- `## Implication for the News Harness angle`
 
 Compare like with like. Do not turn different markets, time periods, or analytical dimensions into a false ranking.
